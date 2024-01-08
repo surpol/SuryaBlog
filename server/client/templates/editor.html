@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post Editor</title>
+    <link href="../static/style.css" rel="stylesheet" type="text/css">
+    <!-- Include stylesheet -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+    <!-- Include the Quill library -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+    <!-- Ensure your style.css file exists and is correctly linked -->
+</head>
+<body>
+    <header>
+        <h1>Welcome Surya </h1>
+    </header>
+
+    <form id="postForm">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+
+        <!-- Create the editor container -->
+        <div id="editor-container"></div>
+
+        <label for="images">Images:</label>
+        <input type="file" id="images" name="images" accept="image/*" multiple>
+
+        <label for="dateCreated">Date:</label>
+        <input type="date" id="dateCreated" name="dateCreated" disabled>
+
+        <button type="submit" id="submitPost">Submit Post</button>
+    </form>
+
+    <footer>
+        <p>All rights reserved. &copy; Surya Polina</p>
+    </footer>
+
+    <script>
+        // Initialize Quill editor
+        var quill = new Quill('#editor-container', {
+            theme: 'snow'
+        });
+
+        // Function to get the query parameter value by name
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Extract and store the token
+        const token = getQueryParam('token');
+        if (token) {
+            localStorage.setItem('token', token);
+            console.log('Token stored in localStorage');
+        } else {
+            console.log('No token found in URL');
+        }
+
+        // Set the dateCreated input to the current date
+        function setCurrentDate() {
+            const date = new Date();
+            const formattedDate = date.toISOString().substr(0, 10); // Format date to YYYY-MM-DD
+            document.getElementById('dateCreated').value = formattedDate;
+        }
+
+        // Set current date on load
+        window.onload = setCurrentDate;
+    </script>
+</body>
+</html>
