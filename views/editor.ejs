@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post Editor</title>
+    <!-- Include Tailwind CSS from CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Include stylesheet for Quill Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <!-- Include the Quill library -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+    <div class="w-full max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-md">
+        <header class="mb-6 text-center">
+            <h1 class="text-3xl font-bold">Welcome Surya</h1>
+        </header>
+        <form id="postForm" action="/submit" method="POST" class="space-y-6">
+            <div class="flex flex-col">
+                <label for="title" class="mb-2 font-semibold">Title:</label>
+                <input type="text" id="title" name="title" class="form-input px-4 py-2 rounded-md border focus:border-blue-500 focus:outline-none" required>
+            </div>
+            <!-- Create the editor container -->
+            <div id="editor-container" class="bg-white"></div>
+            <input type="hidden" id="editorContent" name="text">
+            
+            <div class="flex flex-col">
+                <label for="image" class="mb-2 font-semibold">Image:</label>
+                <input type="file" id="image" name="image" accept="image/*" multiple class="form-input px-4 py-2 rounded-md border focus:border-blue-500 focus:outline-none">
+            </div>
+
+            <div class="flex flex-col">
+                <label for="dateCreated" class="mb-2 font-semibold">Date:</label>
+                <input type="date" id="dateCreated" name="dateCreated" class="form-input px-4 py-2 rounded-md border focus:border-blue-500 focus:outline-none" disabled>
+            </div>
+            
+            <button type="button" id="submitPostButton" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 focus:outline-none" onclick="submitPost()">Submit Post</button>
+        </form>
+    </div>
+    <footer class="text-center py-5 mt-auto">
+        <p>All rights reserved. &copy; Surya Polina</p>
+    </footer>
+
+    <script>
+        // Initialize Quill editor
+        var quill = new Quill('#editor-container', {
+            theme: 'snow'
+        });
+
+        // Function to get the query parameter value by name
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Extract and store the token
+        const token = getQueryParam('token');
+        if (token) {
+            localStorage.setItem('token', token);
+            console.log('Token stored in localStorage');
+        } else {
+            console.log('No token found in URL');
+        }
+
+        // Set the dateCreated input to the current date
+        function setCurrentDate() {
+            const date = new Date();
+            const formattedDate = date.toISOString().substr(0, 10); // Format date to YYYY-MM-DD
+            document.getElementById('dateCreated').value = formattedDate;
+        }
+
+        // Set current date on load
+        window.onload = setCurrentDate;
+
+        function goBack() {
+            window.location.href = '/'; // Replace with your actual home page URL
+        }
+        function submitPost() {
+        // Get the HTML content of the editor
+        var htmlContent = quill.root.innerHTML;
+
+        // Set the hidden input's value to the HTML content
+        document.getElementById('editorContent').value = htmlContent;
+
+        // Now, you can submit the form. If you're using AJAX to submit the form, you can do it here.
+        // For a standard form submission:
+        document.getElementById('postForm').submit();
+    }
+    </script>
+</body>
+</html>

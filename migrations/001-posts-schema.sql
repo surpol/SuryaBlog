@@ -1,7 +1,9 @@
 -- UP
-CREATE TABLE Post (
+CREATE TABLE Posts (
 	id Integer PRIMARY KEY,
-	text String
+	title String, 
+	text String,
+	date_created TEXT
 )
 -- DOWN
-DROP TABLE Post
+--DROP TABLE Posts
