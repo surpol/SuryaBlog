@@ -7,83 +7,133 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 
 </head>
-<body class="bg-gray-100">
-    <header class="text-center py-5">
-        <div class="flex flex-col items-center">
-            <h1 class="text-3xl font-bold">Surya Polina</h1>
-            <p class="text-xl text-gray-700 font-light mt-2">Software Engineer</p>
-        </div>
-        <nav class="mt-4">
-            <a href="/" class="text-blue-500 hover:text-blue-700 mx-2">Home</a>
-            <a href="/gallery" class="text-blue-500 hover:text-blue-700 mx-2">Gallery</a>
-            <a href="/portfolio" class="text-blue-500 hover:text-blue-700 mx-2">Portfolio</a>
-        </nav>
-    </header>
-
-    <!-- Masonry layout for posts -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
-        <% posts.forEach(function(post, index) { %>
-            <div class="bg-white p-4 rounded-lg shadow-lg cursor-pointer" 
-                 onclick="openModal(this)"
-                 data-title="<%= post.title %>"
-                 data-text="<%= post.text %>"
-                 data-date-created="<%= post.date_created %>">
-                <h2 class="text-xl font-bold"><%= post.title %></h2>
-                <p>Published: <%= post.date_created %></p>
+<body class="bg-gray-200">
+    <div class="flex flex-col min-h-screen">
+        <header class="text-center py-5">
+            <div class="flex flex-col items-center">
+                <h1 class="text-3xl font-bold">Surya Polina</h1>
+                <p class="text-xl text-gray-700 font-light mt-2">Software Engineer | Learning to write, code, & write code</p>
             </div>
-        <% }); %>
-    </div>
+            <nav class="mt-4">
+                <a href="/" class="text-gray-800 hover:text-blue-700 mx-2">Home</a>
+                <a href="/gallery" class="text-gray-800 hover:text-blue-700 mx-2">Gallery</a>
+                <a href="/portfolio" class="text-gray-800 hover:text-blue-700 mx-2">Portfolio</a>
+            </nav>
+        </header>
 
-    <!-- Modal -->
-    <div id="modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" onclick="closeModal()">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <!-- Masonry layout for posts -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
+            <% posts.forEach(function(post, index) { %>
+                <div class="bg-white p-4 rounded-lg shadow-lg cursor-pointer" 
+                     onclick="openModal(this)"
+                     data-title="<%= post.title %>"
+                     data-text="<%= post.text %>"
+                     data-date-created="<%= post.date_created %>"
+                     id="post-<%= index %>"> <!-- Add an id attribute -->
+                    <h2 class="text-xl font-bold"><%= post.title %></h2>
+                    <p> <%= post.preview %></p>
+                    <p class="text-gray-500 text-sm">Published: <%= post.date_created %></p>
+
+                </div>
+            <% }); %>
+        </div>
+
+        <!-- Modal -->
+        <div id="modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" onclick="closeModal()">
+            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div class="flex items-center justify-between">
+                <!-- Left arrow for previous blog post -->
+                <button id="prevButton" onclick="loadPrevious(event)">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+
+                <!-- Blog Title -->
+                <div id="header-content" class="text-xl font-bold"> </div>
+                
+                <!-- Right arrow for next blog post -->
+                <button id="nextButton" onclick="loadNext(event)">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
             <div id="modal-content" class="mt-3 text-center">
                 <!-- Dynamic content will be loaded here -->
-            </div>
+            </div>   
+
             <div class="items-center px-4 py-3">
                 <button id="closeBtn" class="px-4 py-2 bg-gray-800 text-white text-base font-medium rounded-md w-full shadow-sm" onclick="closeModal()">Close</button>
             </div>
+            </div>
         </div>
+
+        <footer class="mt-auto bg-indigo-100">
+            <div class="text-center py-5">
+                <div class="flex justify-center space-x-4 mb-4"> <!-- Adjust the space-x-* and mb-* to your liking -->
+                    <a href="mailto:thesuryapolina@gmail.com" class="text-gray-600 hover:text-black">
+                        <i class="fas fa-envelope fa-lg"></i>
+                    </a>
+                    <a href="https://github.com/surpol" target="_blank" class="text-gray-600 hover:text-black">
+                        <i class="fab fa-github fa-lg"></i>
+                    </a>
+                    <a href="https://twitter.com/suryapolina" target="_blank" class="text-blue-400 hover:text-blue-500">
+                        <i class="fab fa-twitter fa-lg"></i>
+                    </a>
+                    <a href="https://instagram.com/surya_polina" target="_blank" class="text-pink-600 hover:text-pink-700">
+                        <i class="fab fa-instagram fa-lg"></i>
+                    </a>
+                </div>
+                <p>All rights reserved. &copy; Surya Polina</p>
+            </div>
+        </footer>
     </div>
-
-    <footer class="text-center py-5">
-        <div class="mb-4">
-            <a href="https://github.com/surpol" target="_blank" class="text-gray-600 hover:text-black mx-2">
-                <i class="fab fa-github fa-lg"></i>
-            </a>
-            <a href="https://twitter.com/suryapolina" target="_blank" class="text-blue-400 hover:text-blue-500 mx-2">
-                <i class="fab fa-twitter fa-lg"></i>
-            </a>
-            <a href="https://instagram.com/surya_polina" target="_blank" class="text-pink-600 hover:text-pink-700 mx-2">
-                <i class="fab fa-instagram fa-lg"></i>
-            </a>
-        </div>
-        <p>All rights reserved. &copy; Surya Polina</p>
-    </footer>
-
+<!----Javascript---->
     <script>
+
+        // Add two new global variables to keep track of the current post index and total posts
+        var currentPostIndex = 0;
+        var totalPosts = <%= posts.length %>;
 
         // Retrieve the data from the clicked element
         function openModal(element) {
+            currentPostIndex = parseInt(element.id.replace('post-', ''));
             const title = element.getAttribute('data-title');
             const text = element.getAttribute('data-text');
             const dateCreated = element.getAttribute('data-date-created');
             
+            document.getElementById('header-content').innerHTML = `
+                <h2 class="text-2xl font-bold">${title}</h2>
+            `;
             // Set the content inside the modal
             document.getElementById('modal-content').innerHTML = `
-                <h2 class="text-2xl font-bold">${title}</h2>
                 <div class="mt-4 text-left">${text}</div>
-                <p class="mt-4">Published: ${dateCreated}</p>
             `;
             // Show the modal
             document.getElementById('modal').classList.remove('hidden');
         }
 
+        function loadPrevious(event) {
+            // Stop click event from reaching the modal overlay
+            event.stopPropagation();
+
+            if (currentPostIndex > 0) {
+                openModal(document.getElementById(`post-${currentPostIndex - 1}`));
+            }
+        }
+
+        function loadNext(event) {
+            // Stop click event from reaching the modal overlay
+            event.stopPropagation();
+
+            if (currentPostIndex < totalPosts - 1) {
+                openModal(document.getElementById(`post-${currentPostIndex + 1}`));
+            }
+        }
 
         // Function to close the modal
         function closeModal() {
             document.getElementById('modal').classList.add('hidden');
         }
+
     </script>
 </body>
 </html>

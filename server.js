@@ -13,8 +13,9 @@
 /* 
 Post schema
 	- Title
+	- Preview
 	- Text
-	- Image
+	- Thumbnail Image
 	- Date Published 
 */
 
@@ -48,18 +49,18 @@ const PASSCODE = process.env.PASSCODE || 'password';
 let JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; // Add a JWT secret to your environment
 let token = "";
 
-// Set EJS as the templating engine
+// set EJS as the templating engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Initialize database connection
+// initialize database connection
 const dbPath = path.resolve(__dirname, 'db', 'posts.db');
 const dbPromise = open({
   filename: dbPath,
   driver: sqlite3.Database,
 });
 
-// Middleware to verify the token
+// middleware to verify the token
 const verifyToken = (req, res, next) => {
   const token = req.cookies['token']; // Get the token from the cookie
   console.log("token:", token);
@@ -76,9 +77,9 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-/* Route Handlers */
+/* ---Route Handlers---*/
 
-// render home and fetch posts
+// fetch posts & render home page 
 app.get('/', async (req, res) => {
   try {
   	const db = await dbPromise;
@@ -93,26 +94,72 @@ app.get('/', async (req, res) => {
 
 // render admin login page 
 app.get('/admin', (req, res) => {
-  // Send the index.html file for the root route
 	res.render('login');
 });
 
 
 // render editor 
-app.get('/editor', verifyToken, (req, res) => {
-	res.render('editor');
+app.get('/editor', verifyToken, async (req, res) => {
+  const db = await dbPromise;
+  try {
+    const posts = await db.all("SELECT * FROM Posts");
+    res.render('editor', { posts });
+  } catch (error) {
+    console.error('Database query error:', error.message);
+    res.status(500).send('Error fetching posts');
+  }
 });
+
+// get post
+app.get('/post/:id', verifyToken, async (req, res) => {
+  const db = await dbPromise;
+  try {
+    const post = await db.get("SELECT * FROM Posts WHERE id = ?", req.params.id);
+    res.json(post);
+  } catch (error) {
+    console.error('Database query error:', error.message);
+    res.status(500).send('Error fetching post');
+  }
+});
+
+// delete post
+app.delete('/post/:id', verifyToken, async (req, res) => {
+  const db = await dbPromise;
+  try {
+    const post = await db.get("DELETE FROM Posts WHERE id = ?", req.params.id);
+    res.json(post);
+  } catch (error) {
+    console.error('Database query error:', error.message);
+    res.status(500).send('Error fetching post');
+  }
+});
+
+// update post
+app.put('/post/:id', verifyToken, async (req, res) => {
+  const db = await dbPromise;
+  try {
+    const { title, preview, text,  } = req.body;
+    const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+    await db.run("UPDATE Posts SET title = ?, preview = ?, text = ? WHERE id = ?", [title, preview, text, req.params.id]);
+    res.status(200).send({ message: 'Post updated successfully' });
+  } catch (error) {
+    console.error('Database query error:', error.message);
+    res.status(500).send('Error updating post');
+  }
+});
+
 
 // submit post 
 app.post('/submit', verifyToken, async (req, res) => {
   const db = await dbPromise;
   const title = req.body.title;
+  const preview = req.body.preview;
   const text = req.body.text;
+
   const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
   console.log(req.body);
-
   try {
-      await db.run('INSERT INTO Posts (title, text, date_created) VALUES (?, ?, ?)', [title, text, currentDate]);
+      await db.run('INSERT INTO Posts (title, preview, text, date_created) VALUES (?, ?, ?, ?)', [title, preview, text, currentDate]);
       res.send('Post successfully created.');
   } catch (error) {
       console.error('Database insert error:', error.message);
@@ -120,8 +167,7 @@ app.post('/submit', verifyToken, async (req, res) => {
   }
 });
 
-
-// process admin login flow
+// admin login flow
 app.post('/login', (req, res) => {
 	const { username, password } = req.body;
 	console.log(username);
@@ -131,24 +177,25 @@ app.post('/login', (req, res) => {
 	if (username === USER && password === PASSCODE) {
 		// Create JWT Token
 		token = jwt.sign({ username }, process.env.JWT_SECRET, {
-		expiresIn: '1h',
+			expiresIn: '1h',
 		});
 
 		// Set token in HTTP-only cookie
-    res.cookie('token', token, {
-        httpOnly: true, // The cookie is not accessible via JavaScript
-        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-        maxAge: 3600000 // Cookie expires in 1 hour, should match JWT expiration
-    });
+	  res.cookie('token', token, {
+	      httpOnly: true, // The cookie is not accessible via JavaScript
+	      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+	      maxAge: 3600000 // Cookie expires in 1 hour, should match JWT expiration
+	  });
 
 		// pass token to 
 		res.redirect('/editor');
 	} else {
-	// Authentication failed
-	res.status(401).send('Login Unsuccessful');
+		// Authentication failed
+		res.status(401).send('Login Unsuccessful');
 	}
 });
 
+// server entry point
 const setup = async () => {
 	const db = await dbPromise;
 	await db.migrate({migrationsPath: './migrations'});
