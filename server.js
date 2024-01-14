@@ -33,6 +33,7 @@ const path = require('path'); // Add path module to handle file paths
 const cookieParser = require('cookie-parser');
 const env = require('dotenv').config();
 const jwt = require('jsonwebtoken'); // Import jsonwebtoken
+const multer  = require('multer')
 const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
 
@@ -41,7 +42,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static('client/public'));
+app.use(express.static('public'));
 
 const PORT = process.env.PORT || 3002;
 const USER = process.env.USERNAME || 'admin';
@@ -60,6 +61,30 @@ const dbPromise = open({
   driver: sqlite3.Database,
 });
 
+// set up storage options with Multer
+const uploadPath = path.resolve(__dirname, 'public', 'images');
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadPath); // Use the uploadPath which points to public/images
+    },
+    filename: (req, file, cb) => {
+      // Use Date.now() to get a unique timestamp for the filename
+      cb(null, Date.now() + path.extname(file.originalname));
+    }
+  }),
+  limits: {
+    fileSize: 1024 * 1024 * 5 // Limit file size to 5MB, adjust as needed
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept images only
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+      return cb(new Error('Only image files are allowed!'), false);
+    }
+    cb(null, true);
+  }
+});
+
 // middleware to verify the token
 const verifyToken = (req, res, next) => {
   const token = req.cookies['token']; // Get the token from the cookie
@@ -67,7 +92,6 @@ const verifyToken = (req, res, next) => {
   if (!token) {
       return res.status(403).send('A token is required for authentication');
   }
-  
   try {
       const decoded = jwt.verify(token, JWT_SECRET);
       req.user = decoded;
@@ -135,12 +159,14 @@ app.delete('/post/:id', verifyToken, async (req, res) => {
 });
 
 // update post
-app.put('/post/:id', verifyToken, async (req, res) => {
+app.put('/post/:id', verifyToken, upload.single('image'), async (req, res) => {
   const db = await dbPromise;
   try {
-    const { title, preview, text,  } = req.body;
-    const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
-    await db.run("UPDATE Posts SET title = ?, preview = ?, text = ? WHERE id = ?", [title, preview, text, req.params.id]);
+        const { title, preview, text  } = req.body;
+    let imagePath = req.file ? path.join('/images', req.file.filename) : undefined; 
+    const updateQuery = `UPDATE Posts SET title = ?, preview = ?, text = ? ${imagePath ? ", imagePath = ?" : ""} WHERE id = ?`;
+    const params = imagePath ? [title, preview, text, imagePath, req.params.id] : [title, preview, text, req.params.id];
+    await db.run(updateQuery, params);
     res.status(200).send({ message: 'Post updated successfully' });
   } catch (error) {
     console.error('Database query error:', error.message);
@@ -150,16 +176,18 @@ app.put('/post/:id', verifyToken, async (req, res) => {
 
 
 // submit post 
-app.post('/submit', verifyToken, async (req, res) => {
+app.post('/submit', verifyToken, upload.single('image'), async (req, res) => {
   const db = await dbPromise;
+
   const title = req.body.title;
   const preview = req.body.preview;
   const text = req.body.text;
-
+  const imagePath = req.file ? path.join('/images', req.file.filename) : ''; // Construct the path for the img src attribute
   const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
   console.log(req.body);
+
   try {
-      await db.run('INSERT INTO Posts (title, preview, text, date_created) VALUES (?, ?, ?, ?)', [title, preview, text, currentDate]);
+      await db.run('INSERT INTO Posts (title, preview, text, imagePath, date_created) VALUES (?, ?, ?, ?, ?)', [title, preview, text, imagePath, currentDate]);
       res.send('Post successfully created.');
   } catch (error) {
       console.error('Database insert error:', error.message);

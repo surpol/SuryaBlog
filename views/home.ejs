@@ -29,11 +29,15 @@
                      data-title="<%= post.title %>"
                      data-text="<%= post.text %>"
                      data-date-created="<%= post.date_created %>"
-                     id="post-<%= index %>"> <!-- Add an id attribute -->
+                     data-image-path="<%= post.imagePath %>"
+                     id="post-<%= index %>">
                     <h2 class="text-xl font-bold"><%= post.title %></h2>
+                    <!-- Display the image as a thumbnail -->
+                    <% if (post.imagePath) { %>
+                        <img src="<%= post.imagePath %>" alt="Thumbnail" class="mb-3 w-full object-cover h-40 rounded-lg"> <!-- Adjust classes as needed -->
+                    <% } %>
                     <p> <%= post.preview %></p>
-                    <p class="text-gray-500 text-sm">Published: <%= post.date_created %></p>
-
+                    <p class="text-gray-500 text-sm">Published: <%= new Date(post.date_created).toLocaleDateString() %></p>
                 </div>
             <% }); %>
         </div>
