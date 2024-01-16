@@ -65,6 +65,12 @@
                     <label for="image" class="mb-2 font-semibold">Thumbnail:</label>
                     <input type="file" id="image" name="image" accept="image/*" multiple class="form-input px-4 py-2 border focus:border-blue-500 focus:outline-none">
                 </div>
+                <div class="flex flex-wrap items-center border border-gray-300 p-2 rounded">
+                  <div id="tags" class="flex flex-wrap">
+                    <!-- Tags will go here -->
+                  </div>
+                  <input type="text" id="tag-input" class="flex-1 p-2 outline-none" placeholder="Add a tag" onkeyup="addTag(event)" />
+                </div>
                 <button type="button" id="submitPostButton" class="px-4 py-2 bg-blue-500 text-white hover:bg-blue-700 focus:outline-none">Submit Post</button>
             </form>
         </div>
@@ -79,20 +85,50 @@
     <script>
         // Initialize Quill editor
         var quill = new Quill('#editor-container', {
+            modules: {
+                toolbar: {
+                  container: [
+                    // Include other toolbar options as needed
+                    ['bold', 'italic', 'underline', 'image']
+                  ]
+                }
+            },
             theme: 'snow'
         });
+
+        let existingTags = [];
+        let selectedPostId = null;
 
         function submitPost() {
             // Get the HTML content of the editor
             var htmlContent = quill.root.innerHTML;
 
-            // Set the hidden input's value to the HTML content
-            document.getElementById('editorContent').value = htmlContent;
+            // Create a FormData object from the form
+            var formData = new FormData(document.getElementById('postForm'));
 
-            // Now, you can submit the form. If you're using AJAX to submit the form, you can do it here.
-            // For a standard form submission:
-            document.getElementById('postForm').submit();
+            // Append the editor content to the FormData
+            formData.set('text', htmlContent); // Use set to ensure you don't create duplicates
+
+            // Collect tags and append them to FormData
+            const tags = collectTags();
+            formData.set('tags', JSON.stringify(tags)); // Use set to overwrite any existing tags field
+
+            // Use fetch to send the request
+            fetch('/submit', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json()) // Parse the response as JSON
+            .then(data => {
+                console.log(data.message); // "Post successfully created."
+                // Handle successful form submission here, like redirecting to a new page or displaying a success message
+            })
+            .catch(error => console.error('Error loading post:', error));
+
+            // Prevent the default form submission
+            return false;
         }
+
 
         function loadPost(postId) {
             // Highlight the selected post
@@ -109,6 +145,11 @@
                     document.getElementById('preview').value = data.preview;
                     // Set the editor content
                     quill.clipboard.dangerouslyPasteHTML(data.text);
+                    // Store existing tags
+                    existingTags = data.tags || [];
+
+                    // Display existing tags
+                    displayTags(existingTags);
                     // Reset the file input for new file uploads
                     document.getElementById('image').value = '';
                 })
@@ -143,11 +184,19 @@
             const formData = new FormData();
             formData.append('title', document.getElementById('title').value);
             formData.append('preview', document.getElementById('preview').value);
-            formData.append('text', quill.root.innerHTML); // Assuming you're using Quill editor
+            formData.append('text', quill.root.innerHTML); 
+
             const imageInput = document.getElementById('image');
             if (imageInput.files[0]) {
                 formData.append('image', imageInput.files[0]);
             }
+
+            // Collect new tags from the DOM
+            const newTags = collectTags();
+
+            // Concatenate existing tags and new tags
+            const allTags = [...new Set([...existingTags, ...newTags])];
+            formData.append('tags', JSON.stringify(allTags));
 
             // Send the PUT request to the server
             fetch(`/post/${postId}`, {
@@ -171,7 +220,26 @@
             .catch(error => console.error('Error updating post:', error));
         }
 
-        let selectedPostId = null;
+        // Function to add tags to the display, including existing tags with removal buttons
+        function displayTags(tagsArray) {
+          const tagsContainer = document.getElementById('tags');
+          tagsContainer.innerHTML = ''; // Clear previous tags
+
+          tagsArray.forEach(tag => {
+            const tagSpan = document.createElement('span');
+            tagSpan.classList.add('tag', 'bg-gray-200', 'rounded', 'px-3', 'py-1', 'm-1', 'flex', 'items-center');
+            tagSpan.textContent = tag;
+            
+            const removeBtn = document.createElement("span");
+            removeBtn.textContent = ' x';
+            removeBtn.classList.add('cursor-pointer', 'ml-2', 'tag-remove-btn');
+            removeBtn.onclick = function() { removeTag(tagSpan, tag); };
+            
+            tagSpan.appendChild(removeBtn);
+            tagsContainer.appendChild(tagSpan);
+          });
+        }
+
         function selectPostForEdit(postElement, postId) {
           if (selectedPostId === postId) {
             // Deselect the post
@@ -194,22 +262,98 @@
         }
 
         function resetForm() {
-          // Reset the form fields
-          document.getElementById('title').value = '';
-          document.getElementById('preview').value = '';
-          quill.setText('');
-          document.getElementById('image').value = null;          
-          // Reset the form action to submit
-          document.getElementById('postForm').action = '/submit';
+            // Reset the form fields
+            document.getElementById('title').value = '';
+            document.getElementById('preview').value = '';
+            quill.setText('');
+            document.getElementById('image').value = null;
+
+            // Clear the tags display
+            const tagsContainer = document.getElementById('tags');
+            tagsContainer.innerHTML = '';
+
+            // Initialize or reset the hidden tags input
+            let tagsInput = document.getElementById('tagsInput');
+            if (!tagsInput) {
+                tagsInput = document.createElement('input');
+                tagsInput.type = 'hidden';
+                tagsInput.id = 'tagsInput';
+                tagsInput.name = 'tags';
+                document.getElementById('postForm').appendChild(tagsInput);
+            }
+            tagsInput.value = JSON.stringify([]);
+            existingTags = [];
+
+            // Reset the form action to submit
+            document.getElementById('postForm').action = '/submit';
+        }
+
+        function addTag(event) {
+            if (event.key === "Enter" && event.target.value.trim() !== "") {
+                // Create the container for the new tag
+                const newTag = document.createElement("span");
+                newTag.classList.add('bg-gray-200', 'rounded', 'px-3', 'py-1', 'm-1', 'flex', 'items-center');
+                
+                // Create a span for the tag text and add the input value
+                const tagText = document.createElement("span");
+                tagText.classList.add('tag-text');
+                tagText.textContent = event.target.value.trim();
+                newTag.appendChild(tagText);
+                // Create a remove button for the tag
+                const removeBtn = document.createElement("span");
+                removeBtn.textContent = "×";
+                removeBtn.classList.add('ml-2', 'cursor-pointer', 'tag-remove-btn');
+                removeBtn.onclick = function() { newTag.remove(); };
+                newTag.appendChild(removeBtn);
+                
+                // Append the new tag to the container
+                document.getElementById("tags").appendChild(newTag);
+                
+                // Clear the input
+                event.target.value = "";
+            }
+        }
+
+         // Function to remove a tag from the display and from the local tag list
+        function removeTag(tagElement, tagName) {
+            // Remove the tag element from the DOM
+            tagElement.remove();
+            // Remove the tag from existingTags array
+            const tagIndex = existingTags.indexOf(tagName);
+            if (tagIndex > -1) {
+                existingTags.splice(tagIndex, 1);
+            }
+            // Update the tags in the form
+            updateFormTags();
+        }
+
+        // Collect tags from the DOM and update the hidden form field
+        function updateFormTags() {
+            const tagsInput = document.getElementById('tagsInput');
+            if (tagsInput) {
+                // Get all tag text elements
+                const tagTextElements = document.querySelectorAll('.tag-text');
+                const tags = Array.from(tagTextElements).map(element => element.textContent);
+
+                // Update the hidden input field for tags
+                tagsInput.value = JSON.stringify(tags);
+            }
+        }
+
+        function collectTags() {
+            const tagElements = document.getElementsByClassName('tag-text');
+            const tags = Array.from(tagElements).map(element => element.textContent);
+            return tags;
         }
 
         document.getElementById('submitPostButton').onclick = function() {
-          if (selectedPostId) {
-            updatePost();
-          } else {
-            submitPost();
-          }
+            if (selectedPostId) {
+                updatePost();
+            } else {
+                submitPost();
+            }
         };
+
     </script>
 </body>
 </html>

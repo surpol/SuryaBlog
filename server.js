@@ -73,9 +73,7 @@ const upload = multer({
       cb(null, Date.now() + path.extname(file.originalname));
     }
   }),
-  limits: {
-    fileSize: 1024 * 1024 * 5 // Limit file size to 5MB, adjust as needed
-  },
+  limits: { fileSize: 10 * 1024 * 1024 }, // Set file size limit to 10MB
   fileFilter: (req, file, cb) => {
     // Accept images only
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
@@ -103,18 +101,35 @@ const verifyToken = (req, res, next) => {
 
 /* ---Route Handlers---*/
 
-// fetch posts & render home page 
 app.get('/', async (req, res) => {
   try {
-  	const db = await dbPromise;
-  	const posts = await db.all("SELECT * FROM Posts;");
-  	console.log("POSTS:", posts);
-		res.render('home', { posts });
+    const db = await dbPromise;
+    const postsWithTagsPromise = db.all(`
+      SELECT Posts.*, GROUP_CONCAT(Tags.name) as tags
+      FROM Posts
+      LEFT JOIN PostTags ON Posts.id = PostTags.post_id
+      LEFT JOIN Tags ON Tags.id = PostTags.tag_id
+      GROUP BY Posts.id
+    `);
+
+    const postsWithTags = await postsWithTagsPromise;
+    
+    // Process the posts to include a tags array
+    const posts = postsWithTags.map(post => {
+      return {
+        ...post,
+        tags: post.tags ? post.tags.split(',') : []
+      };
+    });
+
+    console.log("POSTS:", posts);
+    res.render('home', { posts });
   } catch (error) {
     console.error('Database query error:', error.message);
     res.status(500).send('Error fetching posts');
   }
 });
+
 
 // render admin login page 
 app.get('/admin', (req, res) => {
@@ -126,7 +141,25 @@ app.get('/admin', (req, res) => {
 app.get('/editor', verifyToken, async (req, res) => {
   const db = await dbPromise;
   try {
-    const posts = await db.all("SELECT * FROM Posts");
+    const postsWithTagsPromise = db.all(`
+      SELECT Posts.*, GROUP_CONCAT(Tags.name) as tags
+      FROM Posts
+      LEFT JOIN PostTags ON Posts.id = PostTags.post_id
+      LEFT JOIN Tags ON Tags.id = PostTags.tag_id
+      GROUP BY Posts.id
+    `);
+
+    const postsWithTags = await postsWithTagsPromise;
+    
+    // Process the posts to include a tags array
+    const posts = postsWithTags.map(post => {
+      return {
+        ...post,
+        tags: post.tags ? post.tags.split(',') : []
+      };
+    });
+
+    console.log("POSTS:", posts);
     res.render('editor', { posts });
   } catch (error) {
     console.error('Database query error:', error.message);
@@ -138,8 +171,26 @@ app.get('/editor', verifyToken, async (req, res) => {
 app.get('/post/:id', verifyToken, async (req, res) => {
   const db = await dbPromise;
   try {
+    // Get the post data
     const post = await db.get("SELECT * FROM Posts WHERE id = ?", req.params.id);
-    res.json(post);
+    
+    // Check if post was found
+    if (post) {
+      // Get the tags for the post
+      const tags = await db.all(`
+        SELECT t.name 
+        FROM Tags t
+        INNER JOIN PostTags pt ON t.id = pt.tag_id
+        WHERE pt.post_id = ?
+      `, [req.params.id]);
+
+      // Add tags array to the post object
+      post.tags = tags.map(tag => tag.name);
+
+      res.json(post);
+    } else {
+      res.status(404).send('Post not found');
+    }
   } catch (error) {
     console.error('Database query error:', error.message);
     res.status(500).send('Error fetching post');
@@ -148,31 +199,92 @@ app.get('/post/:id', verifyToken, async (req, res) => {
 
 // delete post
 app.delete('/post/:id', verifyToken, async (req, res) => {
+  const postId = req.params.id;
   const db = await dbPromise;
+  
+  // Start a transaction
+  await db.run('BEGIN TRANSACTION');
   try {
-    const post = await db.get("DELETE FROM Posts WHERE id = ?", req.params.id);
-    res.json(post);
+    // Delete the post
+    await db.run("DELETE FROM Posts WHERE id = ?", postId);
+    
+    // Delete the PostTags relations for this post
+    await db.run("DELETE FROM PostTags WHERE post_id = ?", postId);
+    
+    // Delete orphan tags
+    await db.run(`
+      DELETE FROM Tags
+      WHERE id NOT IN (
+        SELECT tag_id FROM PostTags
+      )
+    `);
+    
+    // Commit the transaction
+    await db.run('COMMIT');
+    
+    res.send({ message: 'Post and orphan tags deleted successfully' });
   } catch (error) {
-    console.error('Database query error:', error.message);
-    res.status(500).send('Error fetching post');
-  }
-});
+		// Rollback the transaction on error
+		await db.run('ROLLBACK');
+		console.error('Database query error:', error.message);
+		res.status(500).send('Error deleting post');
+		}
+	});
 
 // update post
 app.put('/post/:id', verifyToken, upload.single('image'), async (req, res) => {
   const db = await dbPromise;
+  // Start a transaction
+  await db.run('BEGIN TRANSACTION');
   try {
-        const { title, preview, text  } = req.body;
+    const { title, preview, text, tags: tagsJSON } = req.body;
     let imagePath = req.file ? path.join('/images', req.file.filename) : undefined; 
+
+    // Update the post
     const updateQuery = `UPDATE Posts SET title = ?, preview = ?, text = ? ${imagePath ? ", imagePath = ?" : ""} WHERE id = ?`;
     const params = imagePath ? [title, preview, text, imagePath, req.params.id] : [title, preview, text, req.params.id];
     await db.run(updateQuery, params);
+
+    // Manage tags
+    const tags = JSON.parse(tagsJSON);
+    await updatePostTags(db, req.params.id, tags);
+
+    // Commit the transaction
+    await db.run('COMMIT');
+
     res.status(200).send({ message: 'Post updated successfully' });
   } catch (error) {
+    // Rollback the transaction on error
+    await db.run('ROLLBACK');
     console.error('Database query error:', error.message);
     res.status(500).send('Error updating post');
   }
 });
+
+async function updatePostTags(db, postId, tags) {
+  // Remove existing tags for this post
+  await db.run("DELETE FROM PostTags WHERE post_id = ?", postId);
+
+  // Add new tags
+  for (const tag of tags) {
+    let tagId;
+    const existingTag = await db.get("SELECT id FROM Tags WHERE name = ?", tag);
+    if (existingTag) {
+      tagId = existingTag.id;
+    } else {
+      const result = await db.run("INSERT INTO Tags (name) VALUES (?)", tag);
+      tagId = result.lastID;
+    }
+    await db.run("INSERT INTO PostTags (post_id, tag_id) VALUES (?, ?)", [postId, tagId]);
+  }
+   // Delete orphan tags
+  await db.run(`
+    DELETE FROM Tags
+    WHERE id NOT IN (
+      SELECT tag_id FROM PostTags
+    )
+  `);
+}
 
 
 // submit post 
@@ -187,13 +299,49 @@ app.post('/submit', verifyToken, upload.single('image'), async (req, res) => {
   console.log(req.body);
 
   try {
-      await db.run('INSERT INTO Posts (title, preview, text, imagePath, date_created) VALUES (?, ?, ?, ?, ?)', [title, preview, text, imagePath, currentDate]);
-      res.send('Post successfully created.');
+    // Insert the post and get the id of the inserted post
+    const result = await db.run(
+    	'INSERT INTO Posts (title, preview, text, imagePath, date_created) VALUES (?, ?, ?, ?, ?)',
+      [title, preview, text, imagePath, currentDate]
+    );
+    const postId = result.lastID;
+
+    // Parse the tags from the request
+    const tags = JSON.parse(req.body.tags);
+
+    // Insert each tag into the Tags table if it doesn't exist
+    // And then link the post to the tag in the PostTags table
+    for (const tagName of tags) {
+      let tagId;
+
+      // Check if the tag already exists
+      const existingTag = await db.get('SELECT id FROM Tags WHERE name = ?', [tagName]);
+      
+      if (existingTag) {
+        // Use the existing tag's ID
+        tagId = existingTag.id;
+      } else {
+        // Insert the new tag and get its ID
+        const tagResult = await db.run('INSERT INTO Tags (name) VALUES (?)', [tagName]);
+        tagId = tagResult.lastID;
+      }
+
+      // Check if the relation already exists in PostTags to prevent the constraint error
+		  const relationExists = await db.get("SELECT 1 FROM PostTags WHERE post_id = ? AND tag_id = ?", postId, tagId);
+		  if (!relationExists) {
+		    // Insert the relation into PostTags
+		    await db.run("INSERT INTO PostTags (post_id, tag_id) VALUES (?, ?)", postId, tagId);
+		  }
+    }
+
+    res.json({ message:'Post successfully created with tags.' });
   } catch (error) {
-      console.error('Database insert error:', error.message);
-      res.status(500).send('Error saving the post');
-  }
+    console.error('Database insert error:', error.message);
+		res.status(500).send('Error saving the post with tags');
+	}
 });
+
+
 
 // admin login flow
 app.post('/login', (req, res) => {

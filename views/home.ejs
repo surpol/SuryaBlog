@@ -12,63 +12,90 @@
         <header class="text-center py-5">
             <div class="flex flex-col items-center">
                 <h1 class="text-3xl font-bold">Surya Polina</h1>
-                <p class="text-xl text-gray-700 font-light mt-2">Software Engineer | Learning to write, code, & write code</p>
+                <p class="text-xl text-gray-700 font-light mt-2">Software Engineer</p>
+                <p class="text-xl text-gray-700 font-light mt-2">Learning to write, code, & write code</p>
             </div>
             <nav class="mt-4">
-                <a href="/" class="text-gray-800 hover:text-blue-700 mx-2">Home</a>
-                <a href="/gallery" class="text-gray-800 hover:text-blue-700 mx-2">Gallery</a>
-                <a href="/portfolio" class="text-gray-800 hover:text-blue-700 mx-2">Portfolio</a>
+                <a href="/" class="text-blue-800 hover:text-blue-700 mx-2">Home</a>
+                <a href="/gallery" class="text-blue-800 hover:text-blue-700 mx-2">Gallery</a>
+                <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
             </nav>
         </header>
 
         <!-- Masonry layout for posts -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
             <% posts.forEach(function(post, index) { %>
-                <div class="bg-white p-4 rounded-lg shadow-lg cursor-pointer" 
+                <div class="bg-white p-6 shadow-lg cursor-pointer" 
                      onclick="openModal(this)"
                      data-title="<%= post.title %>"
                      data-text="<%= post.text %>"
                      data-date-created="<%= post.date_created %>"
                      data-image-path="<%= post.imagePath %>"
+                     data-tags="<%= post.tags.join(',') %>"
                      id="post-<%= index %>">
-                    <h2 class="text-xl font-bold"><%= post.title %></h2>
+                    <h2 class="text-xl font-bold mb-2"><%= post.title %></h2>
                     <!-- Display the image as a thumbnail -->
                     <% if (post.imagePath) { %>
-                        <img src="<%= post.imagePath %>" alt="Thumbnail" class="mb-3 w-full object-cover h-40 rounded-lg"> <!-- Adjust classes as needed -->
+                        <img src="<%= post.imagePath %>" alt="Thumbnail" class="mb-3 w-full object-cover h-40"> <!-- Adjust classes as needed -->
                     <% } %>
-                    <p> <%= post.preview %></p>
-                    <p class="text-gray-500 text-sm">Published: <%= new Date(post.date_created).toLocaleDateString() %></p>
+                    <p class="mb-2"> <%= post.preview %></p>
+                    <p class="text-gray-500 text-sm mb-2">Published: <%= new Date(post.date_created).toLocaleDateString() %></p>
+                    <!-- Tags section -->
+                    <div class="flex flex-wrap gap-2">
+                        <% 
+                        let tagsArray = [];
+                        if (typeof post.tags === 'string') {
+                            tagsArray = post.tags.split(',');
+                        } else if (Array.isArray(post.tags)) {
+                            tagsArray = post.tags;
+                        }
+                        tagsArray.forEach(function(tag) { %>
+                            <span class="bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">
+                                <%= tag.trim() %>
+                            </span>
+                        <% }) %>
+                    </div>
                 </div>
             <% }); %>
         </div>
 
         <!-- Modal -->
         <div id="modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" onclick="closeModal()">
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg bg-white">
                 <div class="flex items-center justify-between">
-                <!-- Left arrow for previous blog post -->
-                <button id="prevButton" onclick="loadPrevious(event)">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
+                    <!-- Left arrow for previous blog post -->
+                    <button id="prevButton" onclick="loadPrevious(event)">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    
+                    <!-- Right arrow for next blog post -->
+                    <button id="nextButton" onclick="loadNext(event)">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
 
                 <!-- Blog Title -->
-                <div id="header-content" class="text-xl font-bold"> </div>
+                <div id="modal-title" class="text-xl font-bold mt-4"> </div>
                 
-                <!-- Right arrow for next blog post -->
-                <button id="nextButton" onclick="loadNext(event)">
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
+                <!-- Image container -->
+                <div class="mt-4">
+                    <img id="modal-image" src="" alt="Post Thumbnail" class="hidden w-full h-auto rounded" />
+                </div>
 
-            <div id="modal-content" class="mt-3 text-center">
-                <!-- Dynamic content will be loaded here -->
-            </div>   
-
-            <div class="items-center px-4 py-3">
-                <button id="closeBtn" class="px-4 py-2 bg-gray-800 text-white text-base font-medium rounded-md w-full shadow-sm" onclick="closeModal()">Close</button>
-            </div>
+                <!-- Blog Content -->
+                <div id="modal-content" class="mt-3 text-center">
+                    <!-- Dynamic content will be loaded here -->
+                </div>   
+                <!-- Tags container -->
+                <div id="modal-tags" class="mt-3">
+                    <!-- Tags will be added here by JavaScript -->
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="closeBtn" class="px-4 py-2 bg-gray-800 text-white text-base font-medium w-full shadow-sm" onclick="closeModal()">Close</button>
+                </div>
             </div>
         </div>
+
 
         <footer class="mt-auto bg-indigo-100">
             <div class="text-center py-5">
@@ -97,22 +124,65 @@
         var currentPostIndex = 0;
         var totalPosts = <%= posts.length %>;
 
-        // Retrieve the data from the clicked element
         function openModal(element) {
             currentPostIndex = parseInt(element.id.replace('post-', ''));
             const title = element.getAttribute('data-title');
             const text = element.getAttribute('data-text');
             const dateCreated = element.getAttribute('data-date-created');
-            
-            document.getElementById('header-content').innerHTML = `
-                <h2 class="text-2xl font-bold">${title}</h2>
-            `;
-            // Set the content inside the modal
-            document.getElementById('modal-content').innerHTML = `
-                <div class="mt-4 text-left">${text}</div>
-            `;
+            const imagePath = element.getAttribute('data-image-path'); // Make sure you have this attribute in your element
+            const tagsString = element.getAttribute('data-tags'); // Ensure this attribute is set with the tags
+            const tags = tagsString ? tagsString.split(',') : [];
+
+            const modal = document.getElementById('modal');
+            const modalContent = modal.querySelector('#modal-content');
+            const modalTagsContainer = modal.querySelector('#modal-tags'); // Make sure this container exists in your modal HTML
+
+            // Clear previous content
+            modalContent.innerHTML = '';
+            modalTagsContainer.innerHTML = ''; // Clear any existing tags
+
+            // Create and append the title element
+            const titleElement = document.createElement('h2');
+            titleElement.textContent = title;
+            titleElement.className = 'text-2xl font-bold';
+            modalContent.appendChild(titleElement);
+
+            // Create and append the image element, if there is an imagePath
+            if (imagePath) {
+                const imageElement = document.createElement('img');
+                imageElement.src = imagePath;
+                imageElement.alt = 'Thumbnail';
+                imageElement.className = 'w-full h-auto mt-4 rounded'; // Use Tailwind classes
+                modalContent.appendChild(imageElement);
+            }
+
+            // Create and append the text content element
+            const textElement = document.createElement('div');
+            textElement.innerHTML = text;
+            textElement.className = 'mt-4 text-left'; // Use Tailwind classes
+            modalContent.appendChild(textElement);
+
+            // Generate and append tags
+            tags.forEach(tag => {
+                const tagElement = document.createElement('span');
+                tagElement.textContent = tag.trim();
+                tagElement.className = 'inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2'; // Use Tailwind classes
+                modalTagsContainer.appendChild(tagElement);
+            });
+
+            // Append tags container to modal content if it's not already there
+            if (!modalTagsContainer.parentNode) {
+                modalContent.appendChild(modalTagsContainer);
+            }
+
             // Show the modal
-            document.getElementById('modal').classList.remove('hidden');
+            modal.style.display = 'block';
+        }
+
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+
         }
 
         function loadPrevious(event) {
@@ -135,7 +205,7 @@
 
         // Function to close the modal
         function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('modal').style.display = 'none';
         }
 
     </script>
