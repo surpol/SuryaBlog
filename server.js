@@ -104,13 +104,16 @@ const verifyToken = (req, res, next) => {
 app.get('/', async (req, res) => {
   try {
     const db = await dbPromise;
-    const postsWithTagsPromise = db.all(`
-      SELECT Posts.*, GROUP_CONCAT(Tags.name) as tags
-      FROM Posts
-      LEFT JOIN PostTags ON Posts.id = PostTags.post_id
-      LEFT JOIN Tags ON Tags.id = PostTags.tag_id
-      GROUP BY Posts.id
-    `);
+		const postsWithTagsPromise = db.all(`
+		  SELECT Posts.*, GROUP_CONCAT(Tags.name) as tags
+		  FROM Posts
+		  LEFT JOIN PostTags ON Posts.id = PostTags.post_id
+		  LEFT JOIN Tags ON Tags.id = PostTags.tag_id
+		  GROUP BY Posts.id
+		  ORDER BY Posts.date_created DESC
+		`);
+
+
 
     const postsWithTags = await postsWithTagsPromise;
     
@@ -127,6 +130,27 @@ app.get('/', async (req, res) => {
   } catch (error) {
     console.error('Database query error:', error.message);
     res.status(500).send('Error fetching posts');
+  }
+});
+
+app.get('/tag/:tagId', async (req, res) => {
+  try {
+    const db = await dbPromise;
+    const tagName = decodeURIComponent(req.params.tagId);
+    
+    // Query to select posts with the given tag name
+    const posts = await db.all(`
+      SELECT Posts.* FROM Posts
+      JOIN PostTags ON Posts.id = PostTags.post_id
+      JOIN Tags ON PostTags.tag_id = Tags.id
+      WHERE Tags.name = ?
+    `, tagName);
+
+    // Render the page with the filtered posts
+    res.render('tags', { posts, tagName }); // You'll need a 'tag.ejs' view for this
+  } catch (error) {
+    console.error('Database query error:', error.message);
+    res.status(500).send('Error fetching posts by tag');
   }
 });
 

@@ -1,16 +1,11 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Home</title>
+    <title>Posts Tagged with <%= tagName %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Include Tailwind CSS from CDN for styling -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-    <link rel="stylesheet" type="text/css" href="static/styles.css" />
-
 </head>
-
 <body class="bg-gray-200">
     <div class="flex flex-col min-h-screen">
         <header class="text-center py-5">
@@ -23,6 +18,9 @@
                 <a href="/gallery" class="text-blue-800 hover:text-blue-700 mx-2">Gallery</a>
                 <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
             </nav>
+            <section class="text-center py-5">
+                <h2 class="text-3xl font-bold">Searched Tag: <%= tagName %></h2>
+            </section>
         </header>
 
         <main class="flex-grow">
@@ -35,7 +33,6 @@
                                 data-text="<%= post.text %>"
                                 data-date-created="<%= post.date_created %>"
                                 data-image-path="<%= post.imagePath %>"
-                                data-tags="<%= post.tags.join(',') %>"
                                 id="post-<%= index %>">
                                 <h2 class="text-xl font-bold p-4"><%= post.title %></h2>
                                 
@@ -46,15 +43,6 @@
                                 <div class="p-4">
                                     <p class="mb-2"><%= post.preview %></p>
                                     <p class="text-gray-500 text-sm mb-2">Published: <%= new Date(post.date_created).toLocaleDateString() %></p>
-                                    
-                                    <div class="flex flex-wrap gap-2">
-                                        <% post.tags.forEach(function(tag) { %>
-                                            <a href="/tag/<%= tag %>" class="bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 hover:bg-gray-300"
-                                                onclick="event.stopPropagation();">
-                                                <%= tag %>
-                                            </a>
-                                        <% }) %>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -85,10 +73,7 @@
                 <div id="modal-content" class="mt-3 text-center">
                     <!-- Dynamic content will be loaded here -->
                 </div>   
-                <!-- Tags container -->
-                <div id="modal-tags" class="mt-3">
-                    <!-- Tags will be added here by JavaScript -->
-                </div>
+                
                 <div class="items-center px-4 py-3">
                     <button id="closeBtn" class="px-4 py-2 bg-gray-800 text-white text-base font-medium w-full shadow-sm" onclick="closeModal()">Close</button>
                 </div>
@@ -116,9 +101,8 @@
         </footer>
 
     </div>
-<!----Javascript---->
     <script>
-        // Add two new global variables to keep track of the current post index and total posts
+    	// Add two new global variables to keep track of the current post index and total posts
         var currentPostIndex = 0;
         var totalPosts = <%= posts.length %>;
 
@@ -127,16 +111,12 @@
             const title = element.getAttribute('data-title');
             const text = element.getAttribute('data-text');
             const dateCreated = element.getAttribute('data-date-created');
-            const tagsString = element.getAttribute('data-tags'); // Ensure this attribute is set with the tags
-            const tags = tagsString ? tagsString.split(',') : [];
 
             const modal = document.getElementById('modal');
             const modalContent = modal.querySelector('#modal-content');
-            const modalTagsContainer = modal.querySelector('#modal-tags'); // Make sure this container exists in your modal HTML
 
             // Clear previous content
             modalContent.innerHTML = '';
-            modalTagsContainer.innerHTML = ''; // Clear any existing tags
 
             // Create and append the title element
             const titleElement = document.createElement('h2');
@@ -150,44 +130,32 @@
             textElement.className = 'mt-4 text-left'; // Use Tailwind classes
             modalContent.appendChild(textElement);
 
-            // Generate and append tags
-            tags.forEach(tag => {
-                const tagElement = document.createElement('span');
-                tagElement.textContent = tag.trim();
-                tagElement.className = 'inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2'; // Use Tailwind classes
-                modalTagsContainer.appendChild(tagElement);
-            });
-
-            // Append tags container to modal content if it's not already there
-            if (!modalTagsContainer.parentNode) {
-                modalContent.appendChild(modalTagsContainer);
-            }
 
             // Show the modal
             modal.style.display = 'block';
         }
 
-        function loadPrevious(event) {
-            // Stop click event from reaching the modal overlay
-            event.stopPropagation();
-            if (currentPostIndex > 0) {
-                openModal(document.getElementById(`post-${currentPostIndex - 1}`));
-            }
-        }
-
-        function loadNext(event) {
-            // Stop click event from reaching the modal overlay
-            event.stopPropagation();
-            if (currentPostIndex < totalPosts - 1) {
-                openModal(document.getElementById(`post-${currentPostIndex + 1}`));
-            }
-        }
-
         // Function to close the modal
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+    function loadPrevious(event) {
+        // Stop click event from reaching the modal overlay
+        event.stopPropagation();
+        if (currentPostIndex > 0) {
+            openModal(document.getElementById(`post-${currentPostIndex - 1}`));
         }
+    }
 
-    </script>
+    function loadNext(event) {
+        // Stop click event from reaching the modal overlay
+        event.stopPropagation();
+        if (currentPostIndex < totalPosts - 1) {
+            openModal(document.getElementById(`post-${currentPostIndex + 1}`));
+        }
+    }
+
+</script>
+
 </body>
 </html>
