@@ -44,7 +44,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static('public'));
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 80;
 const USER = process.env.USERNAME || 'admin';
 const PASSCODE = process.env.PASSCODE || 'password';
 let JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; // Add a JWT secret to your environment
