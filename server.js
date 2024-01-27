@@ -101,7 +101,7 @@ const verifyToken = (req, res, next) => {
 
 /* ---Route Handlers---*/
 
-app.get('/', async (req, res) => {
+app.get('/blog', async (req, res) => {
   try {
     const db = await dbPromise;
 		const postsWithTagsPromise = db.all(`
@@ -393,6 +393,21 @@ app.post('/login', (req, res) => {
 		// Authentication failed
 		res.status(401).send('Login Unsuccessful');
 	}
+});
+
+// redirect to blog page
+app.get('/', (req, res) => {
+  res.redirect('/blog');
+});
+
+// redirect to gallery page
+app.get('/gallery', (req, res) => {
+    res.render('gallery');
+});
+
+// redirect to portfolio page
+app.get('/portfolio', (req, res) => {
+    res.render('portfolio');
 });
 
 // server entry point

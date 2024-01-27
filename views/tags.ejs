@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Posts Tagged with <%= tagName %></title>
+    <title><%= tagName %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <link rel="icon" type="image/png" href="images/favicon.ico">
 </head>
 <body class="bg-gray-200">
     <div class="flex flex-col min-h-screen">
         <header class="text-center py-5">
             <div class="flex flex-col items-center">
-                <h1 class="text-3xl font-bold"><a href="/">Surya Polina</a></h1>
-                <p class="text-xl text-gray-700 font-light mt-2">Writing about stuff I like</p>
+                <h1 class="text-3xl font-bold"><a href="/blog">Surya Polina</a></h1>
             </div>
             <nav class="mt-4">
-                <a href="/" class="text-blue-800 hover:text-blue-700 mx-2">Home</a>
+                <a href="/blog" class="text-blue-800 hover:text-blue-700 mx-2">Blog</a>
                 <a href="/gallery" class="text-blue-800 hover:text-blue-700 mx-2">Gallery</a>
                 <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
             </nav>
             <section class="text-center py-5">
-                <h2 class="text-3xl font-bold">Searched Tag: <%= tagName %></h2>
+                <h2 class="text-3xl font-bold">tag: [<%= tagName %>]</h2>
             </section>
         </header>
 
@@ -102,38 +102,38 @@
 
     </div>
     <script>
-    	// Add two new global variables to keep track of the current post index and total posts
-        var currentPostIndex = 0;
-        var totalPosts = <%= posts.length %>;
+	// Add two new global variables to keep track of the current post index and total posts
+    var currentPostIndex = 0;
+    var totalPosts = <%= posts.length %>;
 
-        function openModal(element) {
-            currentPostIndex = parseInt(element.id.replace('post-', ''));
-            const title = element.getAttribute('data-title');
-            const text = element.getAttribute('data-text');
-            const dateCreated = element.getAttribute('data-date-created');
+    function openModal(element) {
+        currentPostIndex = parseInt(element.id.replace('post-', ''));
+        const title = element.getAttribute('data-title');
+        const text = element.getAttribute('data-text');
+        const dateCreated = element.getAttribute('data-date-created');
 
-            const modal = document.getElementById('modal');
-            const modalContent = modal.querySelector('#modal-content');
+        const modal = document.getElementById('modal');
+        const modalContent = modal.querySelector('#modal-content');
 
-            // Clear previous content
-            modalContent.innerHTML = '';
+        // Clear previous content
+        modalContent.innerHTML = '';
 
-            // Create and append the title element
-            const titleElement = document.createElement('h2');
-            titleElement.textContent = title;
-            titleElement.className = 'text-2xl font-bold';
-            modalContent.appendChild(titleElement);
+        // Create and append the title element
+        const titleElement = document.createElement('h2');
+        titleElement.textContent = title;
+        titleElement.className = 'text-2xl font-bold';
+        modalContent.appendChild(titleElement);
 
-            // Create and append the text content element
-            const textElement = document.createElement('div');
-            textElement.innerHTML = text;
-            textElement.className = 'mt-4 text-left'; // Use Tailwind classes
-            modalContent.appendChild(textElement);
+        // Create and append the text content element
+        const textElement = document.createElement('div');
+        textElement.innerHTML = text;
+        textElement.className = 'mt-4 text-left'; // Use Tailwind classes
+        modalContent.appendChild(textElement);
 
 
-            // Show the modal
-            modal.style.display = 'block';
-        }
+        // Show the modal
+        modal.style.display = 'block';
+    }
 
         // Function to close the modal
     function closeModal() {

@@ -16,7 +16,7 @@
 
     <!-- Back Button -->
     <div class="absolute top-0 left-0 m-4">
-        <button onclick="window.location.href='/'" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 inline-flex items-center">
+        <button onclick="window.location.href='/blog'" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 inline-flex items-center">
             <i class="fas fa-arrow-left mr-2"></i>
             Back
         </button>
@@ -120,7 +120,9 @@
             })
             .then(response => response.json()) // Parse the response as JSON
             .then(data => {
+                alert('Post successfully created');
                 console.log(data.message); // "Post successfully created."
+                window.location.reload(); // This line will refresh the page
                 // Handle successful form submission here, like redirecting to a new page or displaying a success message
             })
             .catch(error => console.error('Error loading post:', error));
