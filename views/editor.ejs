@@ -27,7 +27,7 @@
         </header>
 
         <!-- Posts Column -->
-        <div class="w-1/4 bg-white p-4 shadow" style="max-height: 90vh; overflow-y: auto;">
+        <div class="bg-white p-4 shadow lg:w-1/4" style="max-height: 90vh; overflow-y: auto;">
             <ul>
                 <% posts.forEach(post => { %>
                     <li class="post-item mb-4 p-2 relative hover:bg-blue-100 cursor-pointer" onclick="selectPostForEdit(this, <%= post.id %>)">
