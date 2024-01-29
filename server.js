@@ -63,19 +63,23 @@ const dbPromise = open({
 
 // set up storage options with Multer
 const uploadPath = path.resolve(__dirname, 'public', 'images');
+const maxImageSize = 10 * 1024 * 1024; // 10 MB, adjust as needed
+const base64Multiplier = 4 / 3; // Base64 increases size by 33%
+
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, uploadPath); // Use the uploadPath which points to public/images
+      cb(null, uploadPath);
     },
     filename: (req, file, cb) => {
-      // Use Date.now() to get a unique timestamp for the filename
       cb(null, Date.now() + path.extname(file.originalname));
     }
   }),
-  limits: { fileSize: 10 * 1024 * 1024 }, // Set file size limit to 10MB
+  limits: { 
+    fileSize: maxImageSize, // Max file size for uploads
+    fieldSize: maxImageSize * base64Multiplier // Max field size for base64 strings
+  },
   fileFilter: (req, file, cb) => {
-    // Accept images only
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
       return cb(new Error('Only image files are allowed!'), false);
     }
