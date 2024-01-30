@@ -36,6 +36,7 @@ const jwt = require('jsonwebtoken'); // Import jsonwebtoken
 const multer  = require('multer')
 const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
+const bcrypt = require('bcrypt');
 
 const app = express();
 
@@ -116,7 +117,6 @@ app.get('/blog', async (req, res) => {
 		  GROUP BY Posts.id
 		  ORDER BY Posts.date_created DESC
 		`);
-
 
 
     const postsWithTags = await postsWithTagsPromise;
@@ -391,30 +391,43 @@ app.post('/submit', verifyToken, upload.single('image'), async (req, res) => {
 
 // admin login flow
 app.post('/login', (req, res) => {
-	const { username, password } = req.body;
-	console.log(username);
-	console.log(password);
+    const { username, password } = req.body;
 
-	// Verify Credentials 
-	if (username === USER && password === PASSCODE) {
-		// Create JWT Token
-		token = jwt.sign({ username }, process.env.JWT_SECRET, {
-			expiresIn: '1h',
-		});
+    // Verify Credentials 
+    // Note: Ensure that USER and HASHED_PASSCODE are loaded from your .env file
+    if (username === USER) {
+        // Compare the provided password with the hashed password
+        bcrypt.compare(password, PASSCODE, (err, isMatch) => {
+        	console.log("PASSCODE" + PASSCODE);
+        	console.log("password" + password);
 
-		// Set token in HTTP-only cookie
-	  res.cookie('token', token, {
-	      httpOnly: true, // The cookie is not accessible via JavaScript
-	      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-	      maxAge: 3600000 // Cookie expires in 1 hour, should match JWT expiration
-	  });
+            if (err) {
+                // Handle error
+                res.status(500).send('An error occurred during login.');
+            } else if (isMatch) {
+                // Passwords match, create JWT Token
+                const token = jwt.sign({ username }, JWT_SECRET, {
+                    expiresIn: '1h',
+                });
 
-		// pass token to 
-		res.redirect('/editor');
-	} else {
-		// Authentication failed
-		res.status(401).send('Login Unsuccessful');
-	}
+                // Set token in HTTP-only cookie
+                res.cookie('token', token, {
+                    httpOnly: true, // The cookie is not accessible via JavaScript
+                    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+                    maxAge: 3600000 // Cookie expires in 1 hour, should match JWT expiration
+                });
+
+                // Redirect to the editor
+                res.redirect('/editor');
+            } else {
+                // Authentication failed
+                res.status(401).send('Login Unsuccessful');
+            }
+        });
+    } else {
+        // Username does not match
+        res.status(401).send('Authentication failed');
+    }
 });
 
 // redirect to blog page
