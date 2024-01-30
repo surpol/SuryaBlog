@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>suryapolina.com</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Include Tailwind CSS from CDN for styling -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <link rel="stylesheet" type="text/css" href="static/styles.css" />
+    <link rel="icon" type="image/png" href="images/favicon.ico">
+</head>
+
+<body class="bg-gray-200">
+  <div class="flex flex-col min-h-screen">
+  <!----Header---->
+  <header class="text-center py-5">
+      <div class="flex flex-col items-center">
+          <h1 class="text-3xl font-bold"><a href="/blog">Surya Polina</a></h1>
+      </div>
+      <nav class="mt-4">
+          <a href="/blog" class="text-blue-800 hover:text-blue-700 mx-2">Blog</a>
+          <a href="/gallery" class="text-blue-800 hover:text-blue-700 mx-2">Gallery</a>
+          <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
+      </nav>
+  </header>
+  <!----Body---->
+  <main class="container mx-auto px-4">
+    <article class="max-w-xl mx-auto mt-10">
+      <h1 class="text-4xl font-bold text-center mb-6"><%= post.title %></h1>
+      <% if (post.imagePath) { %>
+        <img src="<%= post.imagePath %>" alt="<%= post.title %>" class="w-full h-auto rounded-lg mb-6">
+      <% } %>
+      <div class="prose lg:prose-xl">
+        <%- post.text %> <!-- Raw HTML will be styled by Tailwind Typography -->
+      </div>
+    </article>
+  </main>
+  <!----Footer---->
+  <footer class="mt-auto bg-indigo-100">
+        <div class="text-center py-5">
+            <div class="flex justify-center space-x-4 mb-4"> <!-- Adjust the space-x-* and mb-* to your liking -->
+                <a href="mailto:thesuryapolina@gmail.com" class="text-gray-600 hover:text-black">
+                    <i class="fas fa-envelope fa-lg"></i>
+                </a>
+                <a href="https://github.com/surpol" target="_blank" class="text-gray-600 hover:text-black">
+                    <i class="fab fa-github fa-lg"></i>
+                </a>
+                <a href="https://twitter.com/suryapolina" target="_blank" class="text-blue-400 hover:text-blue-500">
+                    <i class="fab fa-twitter fa-lg"></i>
+                </a>
+                <a href="https://instagram.com/surya_polina" target="_blank" class="text-pink-600 hover:text-pink-700">
+                    <i class="fab fa-instagram fa-lg"></i>
+                </a>
+            </div>
+            <p>All rights reserved. &copy; Surya Polina</p>
+        </div>
+    </footer>
+  </div>
+</body>
+</html>

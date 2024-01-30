@@ -130,10 +130,28 @@ app.get('/blog', async (req, res) => {
     });
 
     console.log("POSTS:", posts);
-    res.render('home', { posts });
+    res.render('blog', { posts });
   } catch (error) {
     console.error('Database query error:', error.message);
     res.status(500).send('Error fetching posts');
+  }
+});
+
+app.get('/blog/:id', async (req, res) => {
+  const db = await dbPromise;
+  try {
+    const postId = req.params.id;
+    const post = await db.get("SELECT * FROM Posts WHERE id = ?", postId);
+    if (post) {
+      // If post was found, render it using the 'post.ejs' template
+      res.render('post', { post });
+    } else {
+      // If no post was found, send a 404 error
+      res.status(404).send('Post not found');
+    }
+  } catch (error) {
+    console.error('Database query error:', error.message);
+    res.status(500).send('Error fetching post');
   }
 });
 
