@@ -2,8 +2,6 @@
     margin: 0 auto; /* This will center the container */
 }
 .masonry-grid-item {
-  float: left;
-  width: 300px;
-  margin: 5px;
-  font-size: 0; /* removes white space on bottom */
+  width: 305px;
+  margin-top: 5px;
 }
