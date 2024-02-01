@@ -1,7 +1,9 @@
-.selected-post {
-  background-color: #e2e8f0; /* This is Tailwind's blue-100 color */
+.masonry-grid {
+    margin: 0 auto; /* This will center the container */
 }
-
-.break-inside-avoid-column {
-  break-inside: avoid-column;
+.masonry-grid-item {
+  float: left;
+  width: 300px;
+  margin: 5px;
+  font-size: 0; /* removes white space on bottom */
 }

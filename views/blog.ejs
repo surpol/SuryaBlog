@@ -7,12 +7,12 @@
     <!-- Include Tailwind CSS from CDN for styling -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-    <link rel="stylesheet" type="text/css" href="static/styles.css" />
+    <link rel="stylesheet" type="text/css" href="/static/styles.css" />
     <link rel="icon" type="image/png" href="images/favicon.ico">
-
 </head>
 
 <body class="bg-gray-200">
+    <!-- Header --->
     <div class="flex flex-col min-h-screen">
         <header class="text-center py-5">
             <div class="flex flex-col items-center">
@@ -24,38 +24,36 @@
                 <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
             </nav>
         </header>
-
-        <main class="flex-grow">
-          <div class="container mx-auto px-4">
-            <div class="flex flex-wrap -mx-4">
-              <% posts.forEach(function(post, index) { %>
-                <div class="w-full sm:w-1/2 md:w-1/3 px-4 mb-8">
-                  <a href="/blog/<%= post.id %>" class="no-underline text-black">
-                    <div class="bg-white shadow-lg hover:bg-blue-100 overflow-hidden">
-                      <h2 class="text-xl font-bold p-4"><%= post.title %></h2>
-                      <% if (post.imagePath) { %>
-                        <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full">
-                      <% } %>
-                      <div class="p-4">
-                        <p class="mb-2"><%= post.preview %></p>
-                        <p class="text-gray-500 text-sm mb-2"><%= new Date(post.date_created).toLocaleDateString() %></p>
-                        <div class="flex flex-wrap gap-2">
-                          <% post.tags.forEach(function(tag) { %>
-                            <a href="/tag/<%= tag %>" class="bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 hover:bg-gray-300"
-                              onclick="event.stopPropagation();">
-                              <%= tag %>
-                            </a>
-                          <% }) %>
-                        </div>
-                      </div>
+        <!-- Masonry Grid -->
+        <div class="masonry-grid"  data-masonry-options='{ "isFitWidth": true }'>
+          <% posts.forEach(function(post, index) { %>
+            <!-- Adjust width and margin classes as needed -->
+            <div class="masonry-grid-item">
+              <a href="/blog/<%= post.id %>" class="no-underline text-black">
+                <div class="bg-white shadow-lg hover:bg-blue-100 overflow-hidden" style="height: auto;"> <!-- Adjust height here if necessary -->
+                  <h2 class="text-lg font-bold p-3"><%= post.title %></h2> <!-- Adjust text size and padding as needed -->
+                  <% if (post.imagePath) { %>
+                    <!-- Adjust your image height or leave it to auto to maintain aspect ratio -->
+                    <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full" style="height: auto;">
+                  <% } %>
+                  <div class="p-3"> <!-- Adjust padding as needed -->
+                    <p class="mb-1 text-sm"><%= post.preview %></p> <!-- Adjust bottom margin and font size as needed -->
+                    <p class="text-gray-500 text-xs mb-1"><%= new Date(post.date_created).toLocaleDateString() %></p> <!-- Adjust font size as needed -->
+                    <div class="flex flex-wrap gap-1"> <!-- Adjust gap as needed -->
+                      <% post.tags.forEach(function(tag) { %>
+                        <a href="/tag/<%= tag %>" class="bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-300"
+                          onclick="event.stopPropagation();">
+                          <%= tag %>
+                        </a>
+                      <% }) %>
                     </div>
-                  </a>
+                  </div>
                 </div>
-              <% }); %>
+              </a>
             </div>
-          </div>
-        </main>
-
+          <% }); %>
+        </div>
+        <!-- Footer --->
         <footer class="mt-auto bg-indigo-100">
             <div class="text-center py-5">
                 <div class="flex justify-center space-x-4 mb-4"> <!-- Adjust the space-x-* and mb-* to your liking -->
@@ -77,10 +75,41 @@
         </footer>
 
     </div>
-    <!----Javascript---->
-    <script>
-        
 
-    </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
+<script>
+  // Function to check if all images have loaded
+  function imagesHaveLoaded() {
+    var images = document.images;
+    var loaded = true;
+    for (var i = 0; i < images.length; i++) {
+      if (!images[i].complete) {
+        loaded = false;
+        break;
+      }
+    }
+    return loaded;
+  }
+
+  // Initialize Masonry after all images have loaded
+  function initializeMasonry() {
+    if (imagesHaveLoaded()) {
+      var grid = document.querySelector('.masonry-grid');
+      new Masonry(grid, {
+        itemSelector: '.masonry-grid-item',
+          columnWidth: '.masonry-grid-item',
+          fitWidth: true,
+          gutter: 8 // This adds space between the items
+      });
+    } else {
+      // If not all images are loaded, check again after a short delay
+      setTimeout(initializeMasonry, 100);
+    }
+  }
+
+  // Start the process
+  window.onload = initializeMasonry;
+</script>
+
 </body>
 </html>

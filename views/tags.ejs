@@ -6,9 +6,11 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
     <link rel="icon" type="image/png" href="images/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="/static/styles.css" />
 </head>
 <body class="bg-gray-200">
     <div class="flex flex-col min-h-screen">
+    	 <!----Header---->
         <header class="text-center py-5">
             <div class="flex flex-col items-center">
                 <h1 class="text-3xl font-bold"><a href="/blog">Surya Polina</a></h1>
@@ -22,36 +24,30 @@
                 <h2 class="text-3xl font-bold">tag: [<%= tagName %>]</h2>
             </section>
         </header>
-
-        <main class="flex-grow">
-            <div class="container mx-auto px-4">
-                <div class="flex flex-wrap -mx-4">
-                    <% posts.forEach(function(post, index) { %>
-                        <div class="w-full sm:w-1/2 md:w-1/3 px-4 mb-8">
-                        	<a href="/blog/<%= post.id %>" class="no-underline text-black">
-	                            <div class="bg-white shadow-lg cursor-pointer overflow-hidden" 
-	                                data-title="<%= post.title %>"
-	                                data-text="<%= post.text %>"
-	                                data-date-created="<%= post.date_created %>"
-	                                data-image-path="<%= post.imagePath %>"
-	                                id="post-<%= index %>">
-	                                <h2 class="text-xl font-bold p-4"><%= post.title %></h2>
-	                                
-	                                <% if (post.imagePath) { %>
-	                                    <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full">
-	                                <% } %>
-	                                
-	                                <div class="p-4">
-	                                    <p class="mb-2"><%= post.preview %></p>
-	                                    <p class="text-gray-500 text-sm mb-2">Published: <%= new Date(post.date_created).toLocaleDateString() %></p>
-	                                </div>
-	                            </div>
+        <!----Grid---->
+        <div class="masonry-grid"  data-masonry-options='{ "isFitWidth": true }'>
+            <% posts.forEach(function(post, index) { %>
+                <div class="masonry-grid-item">
+                	<a href="/blog/<%= post.id %>" class="no-underline text-black">
+                        <div class="bg-white shadow-lg hover:bg-blue-100 cursor-pointer overflow-hidden" 
+                            data-title="<%= post.title %>"
+                            data-text="<%= post.text %>"
+                            data-date-created="<%= post.date_created %>"
+                            data-image-path="<%= post.imagePath %>"
+                            id="post-<%= index %>">
+                            <h2 class="text-xl font-bold p-4"><%= post.title %></h2>
+                            <% if (post.imagePath) { %>
+                                <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full">
+                            <% } %>
+                            <div class="p-2">
+                                <p class="mb-2"><%= post.preview %></p>
+                                <p class="text-gray-500 text-sm">Published: <%= new Date(post.date_created).toLocaleDateString() %></p>
+                            </div>
                         </div>
-                    <% }); %>
                 </div>
-            </div>
-        </main>
-
+            <% }); %>
+        </div>
+         <!----Footer---->		
         <footer class="mt-auto bg-indigo-100">
             <div class="text-center py-5">
                 <div class="flex justify-center space-x-4 mb-4"> <!-- Adjust the space-x-* and mb-* to your liking -->
@@ -73,6 +69,41 @@
         </footer>
 
     </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
+<script>
+  // Function to check if all images have loaded
+  function imagesHaveLoaded() {
+    var images = document.images;
+    var loaded = true;
+    for (var i = 0; i < images.length; i++) {
+      if (!images[i].complete) {
+        loaded = false;
+        break;
+      }
+    }
+    return loaded;
+  }
+
+  // Initialize Masonry after all images have loaded
+  function initializeMasonry() {
+    if (imagesHaveLoaded()) {
+      var grid = document.querySelector('.masonry-grid');
+      new Masonry(grid, {
+        itemSelector: '.masonry-grid-item',
+          columnWidth: '.masonry-grid-item',
+          fitWidth: true,
+          gutter: 8 // This adds space between the items
+      });
+    } else {
+      // If not all images are loaded, check again after a short delay
+      setTimeout(initializeMasonry, 100);
+    }
+  }
+
+  // Start the process
+  window.onload = initializeMasonry;
+</script>
 
 </body>
 </html>

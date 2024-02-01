@@ -160,12 +160,13 @@ app.get('/tag/:tagId', async (req, res) => {
     const db = await dbPromise;
     const tagName = decodeURIComponent(req.params.tagId);
     
-    // Query to select posts with the given tag name
+    // Query to select posts with the given tag name, ordered by date descending
     const posts = await db.all(`
       SELECT Posts.* FROM Posts
       JOIN PostTags ON Posts.id = PostTags.post_id
       JOIN Tags ON PostTags.tag_id = Tags.id
       WHERE Tags.name = ?
+      ORDER BY Posts.date_created DESC
     `, tagName);
 
     // Render the page with the filtered posts
