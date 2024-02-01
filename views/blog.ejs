@@ -107,8 +107,9 @@
     }
   }
 
-  // Start the process
-  window.onload = initializeMasonry;
+  document.addEventListener('DOMContentLoaded', (event) => {
+    initializeMasonry();
+  });
 </script>
 
 </body>
