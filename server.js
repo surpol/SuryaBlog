@@ -1,31 +1,56 @@
-/* Components 
-   ----------
- 1. Home (Public) READ ONLY
+/* 
+APIs 
+----------
+1. Home (Public) READ ONLY
  	a. GET /posts, /post/:id
- 2. Post (Public) READ ONLY
- 3. Admin Login (Public) 
+2. Post (Public) READ ONLY
+3. Admin Login (Public) 
  	a. GET /callback (return token in redirect url)
- 4. Editor (Admin Only)
+4. Editor (Admin Only)
  	a. POST /post
  	b. DELETE PUT /post/:id
-*/ 
 
-/* 
 Post schema
 	- Title
 	- Preview
 	- Text
 	- Thumbnail Image
 	- Date Published 
-*/
 
-// PUBLIC api's
-// app.get('/posts')
-// app.get('/posts/:id')
-// PROTECTED api's (require login)
-// app.post('/post')
-// app.delete('/post/:id')
-// app.put('/post/:id')
+PUBLIC API's
+	app.get('/posts')
+	app.get('/posts/:id')
+PROTECTED api's (require login)
+	app.post('/post')
+	app.delete('/post/:id')
+	app.put('/post/:id')
+*/ 
+//Generate qr code with secret key
+/*
+(async () => {
+  const openFile = (await import('open')).default;
+
+  const otpauthUrl = speakeasy.otpauthURL({
+    secret: process.env.SECRET_BASE32,
+    label: encodeURIComponent('SuryaPolinaBlog:spolina'),
+    issuer: 'SuryaPolinaBlog',
+  });
+
+  // Specify the path where you want to save the QR code image
+  const qrImagePath = './QRCode.png';
+
+  // Generate QR code and save as an image
+  QRCode.toFile(qrImagePath, otpauthUrl, function(err) {
+    if (err) {
+      console.error('Error generating QR code', err);
+    } else {
+      console.log(`QR Code saved to ${qrImagePath}. Scan this with your TOTP app.`);
+      // Optionally, open the image file automatically with the default image viewer
+      openFile(qrImagePath);
+    }
+  });
+})();
+*/
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -37,6 +62,8 @@ const multer  = require('multer')
 const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
 const bcrypt = require('bcrypt');
+const speakeasy = require('speakeasy');
+const QRCode = require('qrcode');
 
 const app = express();
 
@@ -45,15 +72,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static('public'));
 
+// initialize environment variables
 const PORT = process.env.PORT || 3000;
 const USER = process.env.USERNAME || 'admin';
 const PASSCODE = process.env.PASSCODE || 'password';
 let JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; // Add a JWT secret to your environment
+const SECRET_BASE32 = process.env.SECRET_BASE32 || speakeasy.generateSecret();
+
 let token = "";
 
 // set EJS as the templating engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+// ensure app is prepared to trust the proxy headers
+app.set('trust proxy', true);
 
 // initialize database connection
 const dbPath = path.resolve(__dirname, 'db', 'posts.db');
@@ -62,11 +94,11 @@ const dbPromise = open({
   driver: sqlite3.Database,
 });
 
-// set up storage options with Multer
+// Set up storage options with Multer
 const uploadPath = path.resolve(__dirname, 'public', 'images');
 const maxImageSize = 10 * 1024 * 1024; // 10 MB, adjust as needed
 const base64Multiplier = 4 / 3; // Base64 increases size by 33%
-
+// Post upload configurations
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
@@ -88,10 +120,10 @@ const upload = multer({
   }
 });
 
-// middleware to verify the token
+/* ----- Middleware -----*/
 const verifyToken = (req, res, next) => {
   const token = req.cookies['token']; // Get the token from the cookie
-  console.log("token:", token);
+  console.log("JWT Token: ", token);
   if (!token) {
       return res.status(403).send('A token is required for authentication');
   }
@@ -104,8 +136,9 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-/* ---Route Handlers---*/
+/* ----- Route Handlers -----*/
 
+// Retrieve All Posts and Render Blog
 app.get('/blog', async (req, res) => {
   try {
     const db = await dbPromise;
@@ -118,7 +151,6 @@ app.get('/blog', async (req, res) => {
 		  ORDER BY Posts.date_created DESC
 		`);
 
-
     const postsWithTags = await postsWithTagsPromise;
     
     // Process the posts to include a tags array
@@ -128,8 +160,6 @@ app.get('/blog', async (req, res) => {
         tags: post.tags ? post.tags.split(',') : []
       };
     });
-
-    console.log("POSTS:", posts);
     res.render('blog', { posts });
   } catch (error) {
     console.error('Database query error:', error.message);
@@ -137,6 +167,7 @@ app.get('/blog', async (req, res) => {
   }
 });
 
+// Retrieve Post by Id
 app.get('/blog/:id', async (req, res) => {
   const db = await dbPromise;
   try {
@@ -155,6 +186,7 @@ app.get('/blog/:id', async (req, res) => {
   }
 });
 
+// Retrieve Posts with custom tag
 app.get('/tag/:tagId', async (req, res) => {
   try {
     const db = await dbPromise;
@@ -177,14 +209,7 @@ app.get('/tag/:tagId', async (req, res) => {
   }
 });
 
-
-// render admin login page 
-app.get('/admin', (req, res) => {
-	res.render('login');
-});
-
-
-// render editor 
+// Render Editor Page
 app.get('/editor', verifyToken, async (req, res) => {
   const db = await dbPromise;
   try {
@@ -205,8 +230,6 @@ app.get('/editor', verifyToken, async (req, res) => {
         tags: post.tags ? post.tags.split(',') : []
       };
     });
-
-    console.log("POSTS:", posts);
     res.render('editor', { posts });
   } catch (error) {
     console.error('Database query error:', error.message);
@@ -214,7 +237,7 @@ app.get('/editor', verifyToken, async (req, res) => {
   }
 });
 
-// get post
+// Get Blog Post
 app.get('/post/:id', verifyToken, async (req, res) => {
   const db = await dbPromise;
   try {
@@ -244,7 +267,7 @@ app.get('/post/:id', verifyToken, async (req, res) => {
   }
 });
 
-// delete post
+// Delete Blog Post
 app.delete('/post/:id', verifyToken, async (req, res) => {
   const postId = req.params.id;
   const db = await dbPromise;
@@ -278,7 +301,7 @@ app.delete('/post/:id', verifyToken, async (req, res) => {
 		}
 	});
 
-// update post
+// Update Blog Post
 app.put('/post/:id', verifyToken, upload.single('image'), async (req, res) => {
   const db = await dbPromise;
   // Start a transaction
@@ -308,6 +331,7 @@ app.put('/post/:id', verifyToken, upload.single('image'), async (req, res) => {
   }
 });
 
+// Update Blog Post Tags
 async function updatePostTags(db, postId, tags) {
   // Remove existing tags for this post
   await db.run("DELETE FROM PostTags WHERE post_id = ?", postId);
@@ -333,8 +357,7 @@ async function updatePostTags(db, postId, tags) {
   `);
 }
 
-
-// submit post 
+// Submit Blog Post
 app.post('/submit', verifyToken, upload.single('image'), async (req, res) => {
   const db = await dbPromise;
 
@@ -343,7 +366,6 @@ app.post('/submit', verifyToken, upload.single('image'), async (req, res) => {
   const text = req.body.text;
   const imagePath = req.file ? path.join('/images', req.file.filename) : ''; // Construct the path for the img src attribute
   const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
-  console.log(req.body);
 
   try {
     // Insert the post and get the id of the inserted post
@@ -389,59 +411,109 @@ app.post('/submit', verifyToken, upload.single('image'), async (req, res) => {
 });
 
 
+/* ----- Login Flow ----- */
 
-// admin login flow
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
+// Define an object to store login attempt data
+const loginAttemptsByIp = {};
 
-    // Verify Credentials 
-    // Note: Ensure that USER and HASHED_PASSCODE are loaded from your .env file
-    if (username === USER) {
-        // Compare the provided password with the hashed password
-        bcrypt.compare(password, PASSCODE, (err, isMatch) => {
-        	console.log("PASSCODE" + PASSCODE);
-        	console.log("password" + password);
-
-            if (err) {
-                // Handle error
-                res.status(500).send('An error occurred during login.');
-            } else if (isMatch) {
-                // Passwords match, create JWT Token
-                const token = jwt.sign({ username }, JWT_SECRET, {
-                    expiresIn: '1h',
-                });
-
-                // Set token in HTTP-only cookie
-                res.cookie('token', token, {
-                    httpOnly: true, // The cookie is not accessible via JavaScript
-                    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-                    maxAge: 3600000 // Cookie expires in 1 hour, should match JWT expiration
-                });
-
-                // Redirect to the editor
-                res.redirect('/editor');
-            } else {
-                // Authentication failed
-                res.status(401).send('Login Unsuccessful');
-            }
-        });
+// Middleware to limit login attempts
+const loginRateLimiter = (req, res, next) => {
+    const ip = req.ip;
+    const now = Date.now();
+    
+    if (!loginAttemptsByIp[ip]) {
+        // If this IP hasn't made a login attempt yet, initialize their data
+        loginAttemptsByIp[ip] = {
+            count: 1,
+            lastAttempt: now
+        };
+        next();
     } else {
-        // Username does not match
-        res.status(401).send('Authentication failed');
+        const data = loginAttemptsByIp[ip];
+        const timeSinceLastAttempt = now - data.lastAttempt;
+
+        // Allow a new attempt if it's been more than 1 minute since the last, otherwise limit
+        if (timeSinceLastAttempt > 300000) { // 60000 milliseconds = 1 minute; 300000 = 5 minutes
+            data.count = 1;
+            data.lastAttempt = now;
+            next();
+        } else if (data.count > 3) { // Only allow 3 attempt every 5 minutes
+            const errorMessage = 'Too many login attempts, please try again later.';
+  					res.render('login', { errorMessage }); // Pass the errorMessage to the template
+        } else {
+            data.count++;
+            data.lastAttempt = now;
+            next();
+        }
     }
+};
+
+// Login
+app.post('/login', loginRateLimiter, (req, res) => {
+  const { username, password, code } = req.body; // Renamed 'code' to 'token' for clarity
+  // Verify Credentials 
+  if (username === USER) {
+    bcrypt.compare(password, PASSCODE, (err, isMatch) => {
+      if (err) {
+        // Handle error
+        res.status(500).send('An error occurred during login.');
+      } else if (isMatch) {
+        // Passwords match, now verify 2FA token
+        const verified = speakeasy.totp.verify({
+          secret: process.env.SECRET_BASE32,
+          token: code, // The token from the user
+        });
+        if (verified) {
+          // 2FA token is valid, create JWT Token
+          const jwtToken = jwt.sign({ username }, JWT_SECRET, {
+            expiresIn: '1h',
+          });
+
+          // Set token in HTTP-only cookie
+          res.cookie('token', jwtToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 3600000 // Cookie expires in 1 hour, should match JWT expiration
+          });
+
+          // Redirect to the editor
+          res.redirect('/editor');
+        } else {
+          // 2FA token verification failed
+          const errorMessage = '2FA verification failed';
+  				res.render('login', { errorMessage }); // Pass the errorMessage to the template
+        }
+      } else {
+        // Authentication failed
+        const errorMessage = 'Incorrect Password';
+  			res.render('login', { errorMessage }); // Pass the errorMessage to the template
+      }
+    });
+  } else {
+    // Authentication failed
+      const errorMessage = 'Incorrect Username';
+			res.render('login', { errorMessage }); // Pass the errorMessage to the template
+  	}
 });
 
-// redirect to blog page
+
+// Render blog
 app.get('/', (req, res) => {
   res.redirect('/blog');
 });
 
-// redirect to gallery page
+// Render login
+app.get('/admin', (req, res) => {
+	const errorMessage = "";
+	res.render('login', {errorMessage});
+});
+
+// Render gallery
 app.get('/gallery', (req, res) => {
     res.render('gallery');
 });
 
-// redirect to portfolio page
+// Render portfolio 
 app.get('/portfolio', (req, res) => {
     res.render('portfolio');
 });

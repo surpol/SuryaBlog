@@ -40,8 +40,28 @@
                 <input type="password" name="password" id="password" placeholder="Password" required
                        class="form-control w-full pl-10 pr-4 py-2 rounded-md focus:outline-none">
             </div>
+            <div class="relative">
+                <span class="fas fa-key form-icon text-gray-400"></span>
+                <input type="text" name="code" id="code" placeholder="2FA Code" required
+                       class="form-control w-full pl-10 pr-4 py-2 rounded-md focus:outline-none" pattern="[0-9]*" inputmode="numeric">
+            </div>
             <input type="submit" value="Login" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-700 cursor-pointer focus:outline-none">
         </form>
     </div>
+    <!-- Include FontAwesome for icons (if not already included) -->
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
+    <script>
+        // Function to display an alert with the given message
+        function showAlert(message) {
+            alert(message);
+        }
+
+        // Check if there's an error message from the server and display an alert
+        const errorMessage = '<%= errorMessage %>'; // Replace with the actual variable name used in your EJS template
+
+        if (errorMessage) {
+            showAlert(errorMessage);
+        }
+    </script>
 </body>
 </html>
