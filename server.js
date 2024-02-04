@@ -1,32 +1,35 @@
 /* 
-APIs 
-----------
-1. Home (Public) READ ONLY
- 	a. GET /posts, /post/:id
-2. Post (Public) READ ONLY
-3. Admin Login (Public) 
- 	a. GET /callback (return token in redirect url)
-4. Editor (Admin Only)
- 	a. POST /post
- 	b. DELETE PUT /post/:id
 
-Post schema
+Post Schema
+-------------------------------------------------
+	- ID
 	- Title
 	- Preview
 	- Text
 	- Thumbnail Image
 	- Date Published 
 
-PUBLIC API's
-	app.get('/posts')
-	app.get('/posts/:id')
-PROTECTED api's (require login)
-	app.post('/post')
-	app.delete('/post/:id')
-	app.put('/post/:id')
-*/ 
-//Generate qr code with secret key
-/*
+Public API's
+-------------------------------------------------
+	GET  	 ('/blog')
+	GET  	 ('/blog/:id')
+	GET  	 ('/blog/tag/:tagId')
+	POST 	 ('/blog/:id'/comment)
+	PUT 	 ('/blog/:id/comment/:id') 
+
+Private API's (Require Authentication)
+-------------------------------------------------
+	GET    ('/post/:id')
+	DELETE ('/post/:id')
+	PUT 	 ('/post/:id')
+	POST   ('/post/submit')
+
+Login API's (Rate Limiting)
+-------------------------------------------------
+	POST 	 ('/login') 
+
+Generate QR code with secret key
+-------------------------------------------------
 (async () => {
   const openFile = (await import('open')).default;
 
@@ -49,8 +52,7 @@ PROTECTED api's (require login)
       openFile(qrImagePath);
     }
   });
-})();
-*/
+})(); */
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -98,6 +100,7 @@ const dbPromise = open({
 const uploadPath = path.resolve(__dirname, 'public', 'images');
 const maxImageSize = 10 * 1024 * 1024; // 10 MB, adjust as needed
 const base64Multiplier = 4 / 3; // Base64 increases size by 33%
+
 // Post upload configurations
 const upload = multer({
   storage: multer.diskStorage({
@@ -136,9 +139,9 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-/* ----- Route Handlers -----*/
+/* ------------ Public APIs ------------ */
 
-// Retrieve All Posts and Render Blog
+// Public | Render Blog & Retrieve All Posts 
 app.get('/blog', async (req, res) => {
   try {
     const db = await dbPromise;
@@ -167,27 +170,31 @@ app.get('/blog', async (req, res) => {
   }
 });
 
-// Retrieve Post by Id
+// Public | Retrieve Post by Id
 app.get('/blog/:id', async (req, res) => {
   const db = await dbPromise;
   try {
     const postId = req.params.id;
+    // Fetch the post from the Posts table
     const post = await db.get("SELECT * FROM Posts WHERE id = ?", postId);
     if (post) {
+    	// Fetch associated comments from the Comments table
+    	const comments = await db.all("SELECT * FROM Comments WHERE postId = ? ORDER BY created_at DESC", postId);
+
       // If post was found, render it using the 'post.ejs' template
-      res.render('post', { post });
+      res.render('post', { post, comments });
     } else {
       // If no post was found, send a 404 error
       res.status(404).send('Post not found');
     }
   } catch (error) {
     console.error('Database query error:', error.message);
-    res.status(500).send('Error fetching post');
+    res.status(500).send('Error fetching post and/or comments');
   }
 });
 
-// Retrieve Posts with custom tag
-app.get('/tag/:tagId', async (req, res) => {
+// Public | Retrieve Posts with custom tag
+app.get('/blog/tag/:tagId', async (req, res) => {
   try {
     const db = await dbPromise;
     const tagName = decodeURIComponent(req.params.tagId);
@@ -209,7 +216,124 @@ app.get('/tag/:tagId', async (req, res) => {
   }
 });
 
-// Render Editor Page
+// New Comment
+app.post('/blog/:id/comment', upload.none(), async (req, res) => {
+    // Assuming 'email' is now part of the form submission alongside 'name' and 'comment'
+    const { email, name, comment } = req.body;
+    const postId = req.params.id;
+    if (!email || !name || !comment) {
+        return res.status(400).send('Email, name, and comment are required.');
+    }
+    
+    try {
+        const db = await dbPromise;
+        
+        // Insert comment into the database
+        // Ensure the query parameters match your schema and the number of placeholders
+        await db.run('INSERT INTO Comments (postId, email, name, comment) VALUES (?, ?, ?, ?)', [postId, email, name, comment]);
+        
+        res.status(201).send('Comment added successfully.');
+    } catch (error) {
+        console.error('Database insert error:', error.message);
+        res.status(500).send('Error adding comment to the database');
+    }
+});
+
+// Update Comment
+app.put('/blog/:postId/comment/:commentId', upload.none(), async (req, res) => {
+  const { comment, password } = req.body;
+  const { postId, commentId } = req.params;
+  if (!comment || !password) {
+  	return res.status(400).json({ success: false, message: 'Require Password and Comment' });
+  }
+
+  // Verify the password
+  const match = await bcrypt.compare(password, PASSCODE);
+  if (!match) {
+  	return res.status(403).json({ success: false, message: 'Incorrect password' });
+  }
+
+  // Assuming you have an open database connection `db`
+  try {
+    const updateResult = await updateCommentById(commentId, comment, postId);
+
+    if (updateResult.success) {
+      res.status(204).json({ success: true, message: 'Comment updated successfully.' });
+    } else {
+      res.status(404).json({ success: false, message: updateResult.message });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+});
+
+// Delete Comment
+app.delete('/blog/:postId/comment/:commentId', upload.none(), async (req, res) => {
+  const { password } = req.body;
+  const { postId, commentId } = req.params;
+  if (!password) {
+  	return res.status(400).json({ success: false, message: 'Require Password' });
+  }
+
+  // Verify the password
+  const match = await bcrypt.compare(password, PASSCODE);
+  if (!match) {
+    return res.status(403).json({ success: false, message: 'Incorrect password' });
+  }
+
+  // Assuming you have an open database connection `db`
+  try {
+    const deleteResult = await deleteCommentById(commentId, postId);
+
+    if (deleteResult.success) {
+      res.status(202).json({ success: true, message: 'Comment deleted successfully.' });
+    } else {
+      res.status(404).json({ success: false, message: deleteResult.message });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+});
+
+// Function to update a comment by ID
+async function updateCommentById(commentId, newCommentText, postId) {
+	console.log("Updating comment...");
+  try {
+  	const db = await dbPromise;
+    const statement = `UPDATE Comments SET comment = ? WHERE id = ? AND postId = ?`;
+    const result = await db.run(statement, [newCommentText, commentId, postId]);
+    
+    if (result.changes) {
+      return { success: true, message: 'Comment updated successfully' };
+    } else {
+      return { success: false, message: 'No comment found with the given ID' };
+    }
+  } catch (error) {
+    throw new Error(`Unable to update the comment: ${error.message}`);
+  }
+}
+
+// Function to update a comment by ID
+async function deleteCommentById(commentId, postId) {
+	console.log("Deleting comment...");
+  try {
+  	const db = await dbPromise;
+		const statement = `DELETE FROM Comments WHERE id = ? AND postId = ?`;
+    const result = await db.run(statement, [commentId, postId]);
+    
+    if (result.changes) {
+      return { success: true, message: 'Comment deleted successfully' };
+    } else {
+      return { success: false, message: 'No comment found with the given ID' };
+    }
+  } catch (error) {
+    throw new Error(`Unable to delete the comment: ${error.message}`);
+  }
+}
+
+/* ------------ Private APIs ------------ */
+
+// Render Editor View
 app.get('/editor', verifyToken, async (req, res) => {
   const db = await dbPromise;
   try {
@@ -237,7 +361,7 @@ app.get('/editor', verifyToken, async (req, res) => {
   }
 });
 
-// Get Blog Post
+// Get Post
 app.get('/post/:id', verifyToken, async (req, res) => {
   const db = await dbPromise;
   try {
@@ -267,7 +391,7 @@ app.get('/post/:id', verifyToken, async (req, res) => {
   }
 });
 
-// Delete Blog Post
+// Delete Post
 app.delete('/post/:id', verifyToken, async (req, res) => {
   const postId = req.params.id;
   const db = await dbPromise;
@@ -301,7 +425,7 @@ app.delete('/post/:id', verifyToken, async (req, res) => {
 		}
 	});
 
-// Update Blog Post
+// Update Post
 app.put('/post/:id', verifyToken, upload.single('image'), async (req, res) => {
   const db = await dbPromise;
   // Start a transaction
@@ -331,7 +455,7 @@ app.put('/post/:id', verifyToken, upload.single('image'), async (req, res) => {
   }
 });
 
-// Update Blog Post Tags
+// Update Post Tags
 async function updatePostTags(db, postId, tags) {
   // Remove existing tags for this post
   await db.run("DELETE FROM PostTags WHERE post_id = ?", postId);
@@ -357,8 +481,8 @@ async function updatePostTags(db, postId, tags) {
   `);
 }
 
-// Submit Blog Post
-app.post('/submit', verifyToken, upload.single('image'), async (req, res) => {
+// Submit Post
+app.post('/post/submit', verifyToken, upload.single('image'), async (req, res) => {
   const db = await dbPromise;
 
   const title = req.body.title;
@@ -403,7 +527,7 @@ app.post('/submit', verifyToken, upload.single('image'), async (req, res) => {
 		  }
     }
 
-    res.json({ message:'Post successfully created with tags.' });
+    res.send('Post successfully created with tags.');
   } catch (error) {
     console.error('Database insert error:', error.message);
 		res.status(500).send('Error saving the post with tags');
@@ -411,7 +535,7 @@ app.post('/submit', verifyToken, upload.single('image'), async (req, res) => {
 });
 
 
-/* ----- Login Flow ----- */
+/* ------------ Login (Public) ------------ */
 
 // Define an object to store login attempt data
 const loginAttemptsByIp = {};
@@ -518,10 +642,41 @@ app.get('/portfolio', (req, res) => {
     res.render('portfolio');
 });
 
-// server entry point
+/*
+
+Update Database
+------------------------
+const knexConfig = {
+  client: 'sqlite3',
+  connection: {
+    filename: './db/posts.db', // Replace with the actual path to your SQLite database file
+  },
+  useNullAsDefault: true, // Required for SQLite
+  migrations: {
+    directory: './migrations', // Path to your migrations directory
+  },
+}; 
+
+const knex = require('knex')(knexConfig);
+
+const commentsTableExists = await knex.schema.hasTable('Comments');
+if (!commentsTableExists) {
+  await knex.schema.createTable('Comments', (table) => {
+    table.increments('id').primary();
+    table.integer('postId').unsigned().references('id').inTable('Posts');
+    table.string('email');
+    table.string('name');
+    table.text('comment');
+    table.datetime('created_at').defaultTo(knex.fn.now());
+  });
+}
+*/
+
+// Entry Point
 const setup = async () => {
 	const db = await dbPromise;
 	await db.migrate({migrationsPath: './migrations'});
+
 	app.listen(PORT, () => {
   	console.log(`Server is running on port ${PORT}`);
 	});

@@ -1,7 +1,8 @@
 .masonry-grid {
-    margin: 0 auto; /* This will center the container */
+  margin: 0 auto;
 }
+
 .masonry-grid-item {
-  width: 305px;
-  margin-top: 5px;
+  width: 305px; /* Example for three columns with 10px gutter */
+  margin-bottom: 5px; /* Gutter size */
 }

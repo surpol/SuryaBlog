@@ -8,10 +8,10 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
     <link rel="stylesheet" type="text/css" href="/static/styles.css" />
-    <link rel="icon" type="image/png" href="images/favicon.ico">
+    <link rel="icon" type="image/png" href="/images/favicon.ico">
 </head>
 
-<body class="bg-gray-200">
+<body class="bg-gray-300">
     <!-- Header --->
     <div class="flex flex-col min-h-screen">
         <header class="text-center py-5">
@@ -40,7 +40,7 @@
                     <p class="mb-1 text-sm "><%= post.preview %></p> <!-- Adjust bottom margin and font size as needed -->
                     <div class="flex flex-wrap gap-1"> <!-- Adjust gap as needed -->
                       <% post.tags.forEach(function(tag) { %>
-                        <a href="/tag/<%= tag %>" class="bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-300"
+                        <a href="blog/tag/<%= tag %>" class="bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-300"
                           onclick="event.stopPropagation();">
                           <%= tag %>
                         </a>
@@ -72,43 +72,24 @@
                 <p>All rights reserved. &copy; Surya Polina</p>
             </div>
         </footer>
-
     </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
+
 <script>
-  // Function to check if all images have loaded
-  function imagesHaveLoaded() {
-    var images = document.images;
-    var loaded = true;
-    for (var i = 0; i < images.length; i++) {
-      if (!images[i].complete) {
-        loaded = false;
-        break;
-      }
-    }
-    return loaded;
-  }
+  document.addEventListener('DOMContentLoaded', function(event) {
+  var grid = document.querySelector('.masonry-grid');
+  var msnry;
 
-  // Initialize Masonry after all images have loaded
-  function initializeMasonry() {
-    if (imagesHaveLoaded()) {
-      var grid = document.querySelector('.masonry-grid');
-      new Masonry(grid, {
-        itemSelector: '.masonry-grid-item',
-          columnWidth: '.masonry-grid-item',
-          fitWidth: true,
-          gutter: 8 // This adds space between the items
-      });
-    } else {
-      // If not all images are loaded, check again after a short delay
-      setTimeout(initializeMasonry, 100);
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', (event) => {
-    initializeMasonry();
+  // Initialize Masonry
+  msnry = new Masonry(grid, {
+    itemSelector: '.masonry-grid-item',
+    columnWidth: '.masonry-grid-item',
+    gutter: 8,
+    fitWidth: true
   });
+
+});
 </script>
 
 </body>

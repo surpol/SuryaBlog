@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" href="images/favicon.ico">
     <link rel="stylesheet" type="text/css" href="/static/styles.css" />
 </head>
-<body class="bg-gray-200">
+<body class="bg-gray-300">
     <div class="flex flex-col min-h-screen">
     	 <!----Header---->
         <header class="text-center py-5">
@@ -40,8 +40,7 @@
                                 <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full">
                             <% } %>
                             <div class="p-2">
-                                <p class="mb-2"><%= post.preview %></p>
-                                <p class="text-gray-500 text-sm">Published: <%= new Date(post.date_created).toLocaleDateString() %></p>
+                                <p class="mb-1 text-sm "><%= post.preview %></p> <!-- Adjust bottom margin and font size as needed -->
                             </div>
                         </div>
                 </div>

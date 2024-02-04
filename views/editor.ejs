@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>suryapolina.com</title>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" crossorigin="anonymous">
-    <link rel="icon" type="image/png" href="images/favicon.ico">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <link rel="icon" type="image/png" href="/images/favicon.ico">
     <!-- Include Tailwind CSS from CDN -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <!-- Include stylesheet for Quill Editor -->
@@ -15,7 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/quill-image-resize-module@3.0.0/image-resize.min.js"></script>
 
 </head>
-<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+<body class="bg-gray-300 flex flex-col items-center justify-center min-h-screen">
 
     <!-- Back Button -->
     <div class="absolute top-0 left-0 m-4">
@@ -51,7 +51,7 @@
 
         <!-- Editor Column -->
         <div class="w-full md:w-1/2 p-4">
-            <form id="postForm" action="/submit" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <form id="postForm" action="/post/submit" method="POST" enctype="multipart/form-data" class="space-y-6">
                 <div class="flex flex-col">
                     <label for="title" class="mb-2 font-semibold">Title:</label>
                     <input type="text" id="title" name="title" class="form-input px-4 py-2 focus:border-blue-500 focus:outline-none" required>
@@ -86,6 +86,14 @@
 
      <!-- JavaScript -->
     <script>
+
+        document.getElementById('submitPostButton').onclick = function() {
+            if (selectedPostId) {
+                updatePost();
+            } else {
+                submitPost();
+            }
+        };
 
         // Ensure that the ImageResize module is available globally
         if (window.Quill && window.QuillImageResizeModule) {
@@ -135,7 +143,7 @@
             formData.set('tags', JSON.stringify(tags)); // Use set to overwrite any existing tags field
 
             // Use fetch to send the request
-            fetch('/submit', {
+            fetch('/post/submit', {
                 method: 'POST',
                 body: formData
             })
@@ -308,7 +316,7 @@
             existingTags = [];
 
             // Reset the form action to submit
-            document.getElementById('postForm').action = '/submit';
+            document.getElementById('postForm').action = '/post/submit';
         }
 
         function addTag(event) {
@@ -369,13 +377,6 @@
             return tags;
         }
 
-        document.getElementById('submitPostButton').onclick = function() {
-            if (selectedPostId) {
-                updatePost();
-            } else {
-                submitPost();
-            }
-        };
 
     </script>
 </body>

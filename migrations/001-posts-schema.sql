@@ -25,7 +25,19 @@ CREATE TABLE PostTags (
 	PRIMARY KEY (post_id, tag_id)
 );
 
+-- Create the Comments table
+CREATE TABLE Comments (
+    id INTEGER PRIMARY KEY,
+    postId INTEGER,
+    email TEXT,
+    name TEXT,
+    comment TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (postId) REFERENCES Posts(id)
+);
+
 -- DOWN
 DROP TABLE PostTags;
 DROP TABLE Tags;
 DROP TABLE Posts;
+DROP TABLE Comments;

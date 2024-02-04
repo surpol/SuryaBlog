@@ -6,11 +6,11 @@
     <!-- Include Tailwind CSS from CDN for styling -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-    <link rel="stylesheet" type="text/css" href="static/styles.css" />
-    <link rel="icon" type="image/png" href="images/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="/static/styles.css" />
+    <link rel="icon" type="image/png" href="/images/favicon.ico">
 </head>
 
-<body class="bg-gray-200">
+<body class="bg-gray-300">
   <div class="flex flex-col min-h-screen">
   <!-- Header -->
     <header class="text-center py-5">
@@ -23,22 +23,79 @@
             <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
         </nav>
     </header>
+  <!-- Grid Container -->
+  <div class="container mx-auto px-4 py-6">
+    <div class="grid md:grid-cols-3 gap-4">
+      <!-- Post Article -->
+      <article class="md:col-span-2 bg-white overflow-hidden mb-6 shadow-lg p-3">
+        <h1 class="text-3xl font-bold text-center my-4"><%= post.title %></h1>
+        <p class="text-gray-500 text-center mb-1">
+          <%= new Date(post.date_created).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+        </p>
+        <div class="prose lg:prose-xl p-4">
+          <%- post.text %> <!-- Post content -->
+        </div>
+      </article>
+      <!-- Comment Form, initially hidden, revealed upon clicking the 'Post comment' input -->
+      <div class="md:col-span-1 w-full">
+        <div id="comment-trigger" class="mb-4 bg-white p-1 shadow-lg">
+          <input 
+            type="text" 
+            class="p-2 w-full" 
+            placeholder="Post comment" 
+            onclick="toggleCommentForm()"
+          />
+        </div>
+        <!-- Comment Form, adjust width as necessary -->
+        <div id="comment-form" class="hidden w-full">
+            <div class="bg-white p-2 shadow-lg">
+                <form action="./comment" method="POST">
+                    <textarea name="comment" rows="4" class="border border-gray-200 w-full p-2 mb-4" placeholder="Enter Comment" required></textarea>
+                    <div class="mb-4">
+                        <input type="text" name="name" class="border border-gray-200 w-full p-2" placeholder="Real Name" required>
+                    </div>
+                    <div class="mb-4">
+                        <input type="email" name="email" class="border border-gray-200 w-full p-2" placeholder="Email" required>
+                    </div>
+                    <div class="flex items-center">
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 focus:outline-none focus:shadow-outline mr-1"> Submit</button>
+                        <button type="button" class="bg-gray-300 hover:bg-gray-400 text-black py-1 px-2 focus:outline-none focus:shadow-outline" onClick="hideCommentForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Comments Section -->
+        <div class="md:col-span-3 mt-4">
+          <% comments.forEach(function(comment) { %>
+            <div class="comment bg-gray-100 p-3 shadow-lg mb-4" id="comment-<%= comment.id %>">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="font-bold text-lg"><%= comment.name %></div>
+                  <div class="text-gray-600 text-sm"><%= comment.email %></div>
+                  <p class="comment-text"><%= comment.comment %></p>
+                  <textarea class="comment-edit-textarea border border-gray-300 w-full p-2 mb-1 hidden" rows="4" required><%= comment.comment %></textarea>
+                  <input type="password" class="comment-edit-passcode border border-gray-300 w-full p-2 mb-3 hidden" placeholder="Admin Password" required>
+                  <button onclick="saveComment('<%= comment.id %>')" class="save-edit hidden bg-blue-500 hover:bg-blue-700 text-white py-1 px-2">Update</button>
+                  <button onclick="deleteComment('<%= comment.id %>')" class="delete-edit hidden bg-red-500 hover:bg-blue-700 text-white py-1 px-2">Delete</button>
+                  <button onFocus="cancelEdit('<%= comment.id %>')" class="cancel-edit hidden bg-gray-300 hover:bg-gray-400 text-black py-1 px-2">Cancel</button>
+                </div>
+                  <a href="javascript:void(0)" onclick="editComment('<%= comment.id %>')" class="edit-link text-blue-600 hover:text-blue-800 cursor-pointer px-4">
+                    edit
+                  </a>
+              </div>
+              <div class="text-right text-gray-500 text-xs">
+                <%= new Date(comment.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+              </div>
+            </div>
+          <% }); %>
 
-    <!-- Main Content -->
-    <main class="flex-1">
-      <div class="container mx-auto px-4">
-        <article class="bg-white shadow-md overflow-hidden max-w-4xl mx-auto mt-4 mb-12"> <!-- Increased bottom margin -->
-          <h1 class="text-3xl font-bold text-center my-4"><%= post.title %></h1>
-          <p class="text-gray-500 text-center mb-1">
-            <%= new Date(post.date_created).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) %>
-          </p> <!-- Date will be displayed in "12 January 2024" style -->
+        </div>
 
-          <div class="prose lg:prose-xl p-4">
-            <%- post.text %> <!-- Post content -->
-          </div>
-        </article>
       </div>
-    </main>
+    </div>
+
+  </div>
+
   <!----Footer---->
   <footer class="mt-auto bg-indigo-100">
         <div class="text-center py-5">
@@ -59,6 +116,166 @@
             <p>All rights reserved. &copy; Surya Polina</p>
         </div>
     </footer>
-  </div>
+
+  <script>
+
+    function toggleCommentForm() {
+        var commentForm = document.getElementById('comment-form');
+        var commentTrigger = document.getElementById('comment-trigger');
+
+        commentForm.classList.toggle('hidden');
+        document.getElementById('comment-trigger').classList.add('hidden');
+    }
+
+    function hideCommentForm() {
+        var commentTrigger = document.getElementById('comment-trigger');
+
+        document.getElementById('comment-form').classList.add('hidden');
+        commentTrigger.classList.toggle('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('comment-form').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent the default form submission behavior
+
+        // Use 'event.target' which is the form that triggered the submit event
+        var formData = new FormData(e.target);
+
+        fetch(window.location.pathname + "/comment", {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          // After successful submission, reload the page to reflect the new comment
+          window.location.reload();
+        })
+        .catch(error => {
+          console.error('There was a problem with the fetch operation:', error);
+        });
+      });
+    });
+
+    function editComment(commentId) {
+      // Find the comment elements
+      const commentElement = document.getElementById('comment-' + commentId);
+      const editTextarea = commentElement.querySelector('.comment-edit-textarea');
+      const editPasscode = commentElement.querySelector('.comment-edit-passcode');
+      const saveButton = commentElement.querySelector('.save-edit');
+      const deleteButton = commentElement.querySelector('.delete-edit');
+      const editLink = commentElement.querySelector('.edit-link');
+      const commentText = commentElement.querySelector('.comment-text');
+      const cancelEdit = commentElement.querySelector('.cancel-edit');
+
+      // Toggle visibility
+      editTextarea.classList.toggle('hidden');
+      editPasscode.classList.toggle('hidden');
+      saveButton.classList.toggle('hidden');
+      deleteButton.classList.toggle('hidden');
+      commentText.classList.toggle('hidden');
+      editLink.classList.toggle('hidden');
+      cancelEdit.classList.toggle('hidden');
+
+    }
+
+    function cancelEdit(commentId) {
+      // Find the comment elements
+      const commentElement = document.getElementById('comment-' + commentId);
+      const editTextarea = commentElement.querySelector('.comment-edit-textarea');
+      const editPasscode = commentElement.querySelector('.comment-edit-passcode');
+      const saveButton = commentElement.querySelector('.save-edit');
+      const deleteButton = commentElement.querySelector('.delete-edit');
+      const cancelButton = commentElement.querySelector('.cancel-edit');
+      const editLink = commentElement.querySelector('.edit-link');
+      const commentText = commentElement.querySelector('.comment-text');
+
+      // Hide the edit fields and buttons
+      editTextarea.classList.add('hidden');
+      editPasscode.classList.add('hidden');
+      saveButton.classList.add('hidden');
+      deleteButton.classList.add('hidden');
+      cancelButton.classList.add('hidden');
+
+      // Show the non-editable comment text and the edit link
+      commentText.classList.remove('hidden');
+      editLink.classList.remove('hidden');
+    }
+
+    function handleResponse(response) {
+      // Check if the response is 204 No Content
+      if (response.status === 204 || response.status === 202) {
+        return { success: true };
+      }
+      // Otherwise, parse the JSON response and check for errors
+      return response.json().then(data => {
+        if (!response.ok) {
+          throw new Error(data.message || 'An unknown error occurred');
+        }
+        return data;
+      });
+    }
+
+    function saveComment(commentId) {
+      // Retrieve the comment text and password from the input fields
+      const commentElement = document.getElementById('comment-' + commentId);
+      const commentText = commentElement.querySelector('.comment-edit-textarea').value;
+      const password = commentElement.querySelector('.comment-edit-passcode').value;
+
+      // Construct the request URL
+      const postId = window.location.pathname.split('/')[2];
+      const url = `/blog/${postId}/comment/${commentId}`;
+
+      // Send a PUT request to the server
+      fetch(url, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comment: commentText, password: password })
+      })
+      .then(handleResponse)
+      .then(data => {
+        if (data.success) {
+          console.log(data.message);
+          alert('Update Successful');
+          window.location.reload();
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert(error.message);
+      });
+    }
+
+    function deleteComment(commentId) {
+      // Retrieve the password from the input field
+      const commentElement = document.getElementById('comment-' + commentId);
+      const password = commentElement.querySelector('.comment-edit-passcode').value;
+
+      // Construct the request URL
+      const postId = window.location.pathname.split('/')[2];
+      const url = `/blog/${postId}/comment/${commentId}`;
+
+      // Send a DELETE request to the server
+      fetch(url, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: password })
+      })
+      .then(handleResponse)
+      .then(data => {
+        if (data.success) {
+          console.log(data.message);
+          alert('Delete Successful');
+          window.location.reload();
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert(error.message);
+      });
+    }
+
+  </script>
 </body>
 </html>
