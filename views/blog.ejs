@@ -37,7 +37,7 @@
                     <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full" style="height: auto;">
                   <% } %>
                   <div class="p-3"> <!-- Adjust padding as needed -->
-                    <p class="mb-1 text-sm "><%= post.preview %></p> <!-- Adjust bottom margin and font size as needed -->
+                    <p class="mb-1 text-sm"><%= post.preview %></p> <!-- Adjust bottom margin and font size as needed -->
                     <div class="flex flex-wrap gap-1"> <!-- Adjust gap as needed -->
                       <% post.tags.forEach(function(tag) { %>
                         <a href="blog/tag/<%= tag %>" class="bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-300"
