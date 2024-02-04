@@ -75,22 +75,42 @@
     </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
-
 <script>
-  document.addEventListener('DOMContentLoaded', function(event) {
-  var grid = document.querySelector('.masonry-grid');
-  var msnry;
+  // Function to check if all images have loaded
+  function imagesHaveLoaded() {
+    var images = document.images;
+    var loaded = true;
+    for (var i = 0; i < images.length; i++) {
+      if (!images[i].complete) {
+        loaded = false;
+        break;
+      }
+    }
+    return loaded;
+  }
 
-  // Initialize Masonry
-  msnry = new Masonry(grid, {
-    itemSelector: '.masonry-grid-item',
-    columnWidth: '.masonry-grid-item',
-    gutter: 8,
-    fitWidth: true
+  // Initialize Masonry after all images have loaded
+  function initializeMasonry() {
+    if (imagesHaveLoaded()) {
+      var grid = document.querySelector('.masonry-grid');
+      new Masonry(grid, {
+        itemSelector: '.masonry-grid-item',
+          columnWidth: '.masonry-grid-item',
+          fitWidth: true,
+          gutter: 8 // This adds space between the items
+      });
+    } else {
+      // If not all images are loaded, check again after a short delay
+      setTimeout(initializeMasonry, 100);
+    }
+  }
+
+  // start process
+  document.addEventListener('DOMContentLoaded', (event) => {
+    initializeMasonry();
   });
-
-});
 </script>
+
 
 </body>
 </html>
