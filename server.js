@@ -527,10 +527,10 @@ app.post('/post/submit', verifyToken, upload.single('image'), async (req, res) =
 		  }
     }
 
-    res.send('Post successfully created with tags.');
+    res.json({ message: 'Post successfully created.' });
   } catch (error) {
     console.error('Database insert error:', error.message);
-		res.status(500).send('Error saving the post with tags');
+    res.status(500).json({ error: 'Error submitting post' });
 	}
 });
 

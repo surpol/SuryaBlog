@@ -147,14 +147,15 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json()) // Parse the response as JSON
+            .then(response => response.json())  // Parse JSON response
             .then(data => {
-                alert('Post successfully created');
-                console.log(data.message); // "Post successfully created."
-                window.location.reload(); // This line will refresh the page
-                // Handle successful form submission here, like redirecting to a new page or displaying a success message
+              console.log(data.message);  // Handle success
+              alert("Post Submitted");
+              window.location.reload()
             })
-            .catch(error => console.error('Error loading post:', error));
+            .catch(error => {
+              console.error('Error:', error);
+            });
 
             // Prevent the default form submission
             return false;
