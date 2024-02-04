@@ -78,9 +78,9 @@
                   <p class="comment-text"><%= comment.comment %></p>
                   <textarea class="comment-edit-textarea border border-gray-300 w-full p-2 mb-1 hidden" rows="4" required><%= comment.comment %></textarea>
                   <input type="password" class="comment-edit-passcode border border-gray-300 w-full p-2 mb-3 hidden" placeholder="Password" required>
-                  <button onclick="updateComment('<%= comment.id %>')" class="save-edit hidden bg-blue-500 hover:bg-blue-700 text-white py-1 px-2">Update</button>
-                  <button onclick="deleteComment('<%= comment.id %>')" class="delete-edit hidden bg-red-500 hover:bg-blue-700 text-white py-1 px-2">Delete</button>
-                  <button onFocus="cancelEdit('<%= comment.id %>')" class="cancel-edit hidden bg-gray-300 hover:bg-gray-400 text-black py-1 px-2">Cancel</button>
+                  <button onClick="updateComment('<%= comment.id %>')" class="save-edit hidden bg-blue-500 hover:bg-blue-700 text-white py-1 px-2">Update</button>
+                  <button onClick="deleteComment('<%= comment.id %>')" class="delete-edit hidden bg-red-500 hover:bg-blue-700 text-white py-1 px-2">Delete</button>
+                  <button onClick="cancelEdit('<%= comment.id %>')" class="cancel-edit hidden bg-gray-300 hover:bg-gray-400 text-black py-1 px-2">Cancel</button>
                 </div>
                   <a href="javascript:void(0)" onclick="editComment('<%= comment.id %>')" class="edit-link text-blue-600 hover:text-blue-800 cursor-pointer px-4">
                     edit
@@ -207,10 +207,6 @@
     }
 
     function handleResponse(response) {
-      // Check if the response is 204 No Content
-      if (response.status === 204 || response.status === 202) {
-        return { success: true };
-      }
       // Otherwise, parse the JSON response and check for errors
       return response.json().then(data => {
         if (!response.ok) {
