@@ -216,80 +216,112 @@ app.get('/blog/tag/:tagId', async (req, res) => {
   }
 });
 
-// New Comment
+// New Comment with Optional Password
 app.post('/blog/:id/comment', upload.none(), async (req, res) => {
-    // Assuming 'email' is now part of the form submission alongside 'name' and 'comment'
-    const { email, name, comment } = req.body;
-    const postId = req.params.id;
-    if (!email || !name || !comment) {
-        return res.status(400).send('Email, name, and comment are required.');
-    }
+  const { email, name, comment, password } = req.body;
+  const postId = req.params.id;
+  // Validate input
+  if (!email || !name || !comment) {
+    return res.status(400).send('Email, name, and comment are required.');
+  }
+
+  try {
+    const db = await dbPromise;
+    let hashedPassword = null;
     
-    try {
-        const db = await dbPromise;
-        
-        // Insert comment into the database
-        // Ensure the query parameters match your schema and the number of placeholders
-        await db.run('INSERT INTO Comments (postId, email, name, comment) VALUES (?, ?, ?, ?)', [postId, email, name, comment]);
-        
-        res.status(201).send('Comment added successfully.');
-    } catch (error) {
-        console.error('Database insert error:', error.message);
-        res.status(500).send('Error adding comment to the database');
+    // Hash the password if provided
+    if (password) {
+      hashedPassword = await bcrypt.hash(password, 10);
     }
+
+    // Insert comment into the database
+    await db.run('INSERT INTO Comments (postId, email, name, comment, password) VALUES (?, ?, ?, ?, ?)',
+                 [postId, email, name, comment, hashedPassword]);
+
+    res.status(201).send('Comment added successfully.');
+  } catch (error) {
+    console.error('Database insert error:', error.message);
+    res.status(500).send('Error adding comment to the database');
+  }
 });
 
-// Update Comment
+// Function to verify comment password if it exists
+async function verifyOptionalCommentPassword(commentId, providedPassword) {
+  const db = await dbPromise;
+  const comment = await db.get('SELECT password FROM Comments WHERE id = ?', [commentId]);
+
+  if (!comment) {
+    return { success: false, message: 'No comment found with the given ID' };
+  }
+
+  // If no password was set during comment creation, bypass password check
+  if (comment.password === null) {
+    return { success: false, message: 'No password set for this comment' };
+  }
+
+  // If a password was provided, compare it to the stored hash
+  if (providedPassword) {
+    const match = await bcrypt.compare(providedPassword, comment.password);
+    if (!match) {
+      return { success: false, message: 'Incorrect password' };
+    }
+    return { success: true, message: 'Password verified successfully' };
+  }
+
+  // If no password was provided but one exists for the comment, deny access
+  return { success: false, message: 'Password is required for this comment' };
+}
+
+// Update Comment with Password Verification
 app.put('/blog/:postId/comment/:commentId', upload.none(), async (req, res) => {
   const { comment, password } = req.body;
   const { postId, commentId } = req.params;
   if (!comment || !password) {
-  	return res.status(400).json({ success: false, message: 'Require Password and Comment' });
+    return res.status(400).json({ success: false, message: 'Comment and Password are required' });
   }
 
-  // Verify the password
-  const match = await bcrypt.compare(password, PASSCODE);
-  if (!match) {
-  	return res.status(403).json({ success: false, message: 'Incorrect password' });
-  }
-
-  // Assuming you have an open database connection `db`
   try {
-    const updateResult = await updateCommentById(commentId, comment, postId);
-
-    if (updateResult.success) {
-      res.status(204).json({ success: true, message: 'Comment updated successfully.' });
-    } else {
-      res.status(404).json({ success: false, message: updateResult.message });
+    // Verify the password
+    const passwordResult = await verifyOptionalCommentPassword(commentId, password);
+    if (!passwordResult.success) {
+      return res.status(403).json(passwordResult);
     }
+
+    // Update the comment if the password is correct
+    const updateResult = await updateCommentById(commentId, comment, postId);
+    if (!updateResult.success) {
+      return res.status(404).json(updateResult);
+    }
+
+    res.json(updateResult);
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
 });
 
-// Delete Comment
+// Delete Comment with Password Verification
 app.delete('/blog/:postId/comment/:commentId', upload.none(), async (req, res) => {
   const { password } = req.body;
   const { postId, commentId } = req.params;
+
   if (!password) {
-  	return res.status(400).json({ success: false, message: 'Require Password' });
+    return res.status(400).json({ success: false, message: 'Password is required' });
   }
 
-  // Verify the password
-  const match = await bcrypt.compare(password, PASSCODE);
-  if (!match) {
-    return res.status(403).json({ success: false, message: 'Incorrect password' });
-  }
-
-  // Assuming you have an open database connection `db`
   try {
-    const deleteResult = await deleteCommentById(commentId, postId);
-
-    if (deleteResult.success) {
-      res.status(202).json({ success: true, message: 'Comment deleted successfully.' });
-    } else {
-      res.status(404).json({ success: false, message: deleteResult.message });
+    // Verify the password
+    const passwordResult = await verifyOptionalCommentPassword(commentId, password);
+    if (!passwordResult.success) {
+      return res.status(403).json(passwordResult);
     }
+
+    // Delete the comment if the password is correct
+    const deleteResult = await deleteCommentById(commentId, postId);
+    if (!deleteResult.success) {
+      return res.status(404).json(deleteResult);
+    }
+
+    res.json(deleteResult);
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
@@ -306,7 +338,7 @@ async function updateCommentById(commentId, newCommentText, postId) {
     if (result.changes) {
       return { success: true, message: 'Comment updated successfully' };
     } else {
-      return { success: false, message: 'No comment found with the given ID' };
+      return { success: false, message: 'Comment update failed' };
     }
   } catch (error) {
     throw new Error(`Unable to update the comment: ${error.message}`);
@@ -324,7 +356,7 @@ async function deleteCommentById(commentId, postId) {
     if (result.changes) {
       return { success: true, message: 'Comment deleted successfully' };
     } else {
-      return { success: false, message: 'No comment found with the given ID' };
+      return { success: false, message: 'Comment delete failed' };
     }
   } catch (error) {
     throw new Error(`Unable to delete the comment: ${error.message}`);

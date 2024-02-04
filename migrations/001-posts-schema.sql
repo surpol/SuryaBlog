@@ -32,6 +32,7 @@ CREATE TABLE Comments (
     email TEXT,
     name TEXT,
     comment TEXT,
+    password TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (postId) REFERENCES Posts(id)
 );
