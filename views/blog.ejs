@@ -25,7 +25,8 @@
             </nav>
         </header>
         <!-- Masonry Grid -->
-        <div class="masonry-grid"  data-masonry-options='{ "isFitWidth": true }'>
+        <!-- Add the 'masonry-grid-hidden' class to initially hide the Masonry grid -->
+        <div class="masonry-grid masonry-grid-hidden" data-masonry-options='{ "isFitWidth": true }'>
           <% posts.forEach(function(post, index) { %>
             <!-- Adjust width and margin classes as needed -->
             <div class="masonry-grid-item">
@@ -93,6 +94,7 @@
   function initializeMasonry() {
     if (imagesHaveLoaded()) {
       var grid = document.querySelector('.masonry-grid');
+      grid.classList.remove('masonry-grid-hidden'); // Remove the 'masonry-grid-hidden' class to display the Masonry grid
       new Masonry(grid, {
         itemSelector: '.masonry-grid-item',
           columnWidth: '.masonry-grid-item',

@@ -7,3 +7,7 @@
   width: 305px; /* Example for three columns with 10px gutter */
   margin-bottom: 5px; /* Gutter size */
 }
+
+.masonry-grid-hidden {
+    display: none;
+}
