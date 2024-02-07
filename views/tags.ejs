@@ -29,12 +29,12 @@
             <% posts.forEach(function(post, index) { %>
                 <div class="masonry-grid-item">
                 	<a href="/blog/<%= post.id %>" class="no-underline text-black">
-                        <div class="bg-white shadow-lg hover:bg-blue-100 cursor-pointer overflow-hidden">
-                            <h2 class="text-xl font-bold p-3"><%= post.title %></h2>
+                        <div class="bg-white shadow-lg hover:bg-blue-100 cursor-pointer overflow-hidden p-3">
+                            <h2 class="text-xl font-bold"><%= post.title %></h2>
                             <% if (post.imagePath) { %>
-                                <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full">
+                                <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full p-3">
                             <% } %>
-                            <div class="p-3">
+                            <div>
                                 <p class="mb-1 text-sm"><%= post.preview %></p> <!-- Adjust bottom margin and font size as needed -->
                             </div>
                         </div>
