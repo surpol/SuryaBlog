@@ -31,13 +31,13 @@
             <!-- Adjust width and margin classes as needed -->
             <div class="masonry-grid-item">
               <a href="/blog/<%= post.id %>" class="no-underline text-black">
-                <div class="bg-white shadow-lg hover:bg-blue-100 overflow-hidden" style="height: auto;"> <!-- Adjust height here if necessary -->
-                  <h2 class="text-lg font-bold p-3"><%= post.title %></h2> <!-- Adjust text size and padding as needed -->
+                <div class="bg-white shadow-lg hover:bg-blue-100 overflow-hidden p-3" style="height: auto;"> <!-- Adjust height here if necessary -->
+                  <h2 class="text-lg font-bold"><%= post.title %></h2> <!-- Adjust text size and padding as needed -->
                   <% if (post.imagePath) { %>
                     <!-- Adjust your image height or leave it to auto to maintain aspect ratio -->
-                    <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full" style="height: auto;">
+                    <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full p-3" style="height: auto;">
                   <% } %>
-                  <div class="p-3"> <!-- Adjust padding as needed -->
+                  <div> <!-- Adjust padding as needed -->
                     <p class="mb-1 text-sm"><%= post.preview %></p> <!-- Adjust bottom margin and font size as needed -->
                     <div class="flex flex-wrap gap-1"> <!-- Adjust gap as needed -->
                       <% post.tags.forEach(function(tag) { %>
