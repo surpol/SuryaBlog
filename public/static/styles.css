@@ -11,3 +11,12 @@
 .masonry-grid-hidden {
     display: none;
 }
+
+.ql-syntax {
+    background-color: #23241f;
+    color: #f8f8f2;
+    overflow: hidden;
+    padding: 15px 15px;
+    white-space: pre-wrap;
+    border-radius: 3px;
+}
