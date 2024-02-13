@@ -66,6 +66,8 @@ const { open } = require('sqlite');
 const bcrypt = require('bcrypt');
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
+const sharp = require('sharp'); // Make sure to have sharp installed (`npm install sharp`)
+const cheerio = require('cheerio');
 
 const app = express();
 
@@ -177,11 +179,20 @@ app.get('/blog/:id', async (req, res) => {
     const postId = req.params.id;
     // Fetch the post from the Posts table
     const post = await db.get("SELECT * FROM Posts WHERE id = ?", postId);
+    
     if (post) {
-    	// Fetch associated comments from the Comments table
-    	const comments = await db.all("SELECT * FROM Comments WHERE postId = ? ORDER BY created_at DESC", postId);
+      // Fetch associated comments from the Comments table
+      const comments = await db.all("SELECT * FROM Comments WHERE postId = ? ORDER BY created_at DESC", postId);
 
-      // If post was found, render it using the 'post.ejs' template
+      // Load the post content into cheerio for manipulation
+      const $ = cheerio.load(post.text);
+
+      // Apply Tailwind CSS classes to h1 tags
+      $('h1').addClass('text-2xl font-bold mt-4 mb-2');
+
+      // Update the post content with styled elements
+      post.text = $.html();
+
       res.render('post', { post, comments });
     } else {
       // If no post was found, send a 404 error
