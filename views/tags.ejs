@@ -36,6 +36,8 @@
                             <% } %>
                             <div>
                                 <p class="mb-1 text-sm"><%= post.preview %></p> <!-- Adjust bottom margin and font size as needed -->
+                                <p class="text-gray-500 mb-1 text-sm"><%= new Date(post.date_created).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) %></p> <!-- Adjust bottom margin and font size as needed -->
+
                             </div>
                         </div>
                 </div>
