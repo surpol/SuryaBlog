@@ -1,4 +1,10 @@
+body{
+  font-family: Helvetica-neue, Helvetica, sans-serif;
+  background-color: #f1f1f1;
+}
+
 .masonry-grid {
+  font-family: Helvetica-neue, Helvetica, sans-serif;
   margin: 0 auto;
   margin-bottom: 10px;
 }
@@ -20,3 +26,4 @@
     white-space: pre-wrap;
     border-radius: 3px;
 }
+
