@@ -20,7 +20,6 @@
             </div>
             <nav class="mt-4">
                 <a href="/blog" class="text-blue-800 hover:text-blue-700 mx-2">Blog</a>
-                <a href="/gallery" class="text-blue-800 hover:text-blue-700 mx-2">Gallery</a>
                 <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
             </nav>
         </header>
@@ -31,26 +30,26 @@
             <!-- Adjust width and margin classes as needed -->
             <div class="masonry-grid-item">
               <a href="/blog/<%= post.id %>" class="no-underline text-black">
-                <div class="bg-white shadow-lg hover:bg-blue-100 overflow-hidden p-3" style="height: auto;"> <!-- Adjust height here if necessary -->
-                  <h2 class="text-lg font-bold"><%= post.title %></h2> <!-- Adjust text size and padding as needed -->
+                <div class="bg-white shadow-lg hover:bg-blue-100 overflow-hidden p-3">
+                  <h2 class="text-lg font-bold"><%= post.title %></h2>
                   <% if (post.imagePath) { %>
-                    <!-- Adjust your image height or leave it to auto to maintain aspect ratio -->
-                    <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full p-3" style="height: auto;">
+                    <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full p-3">
                   <% } %>
-                  <div> <!-- Adjust padding as needed -->
-                    <p class="mb-1 text-sm"><%= post.preview %></p> <!-- Adjust bottom margin and font size as needed -->
-                    <div class="flex flex-wrap gap-1"> <!-- Adjust gap as needed -->
-                      <% post.tags.forEach(function(tag) { %>
-                        <a href="blog/tag/<%= tag %>" class="bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-300"
-                          onclick="event.stopPropagation();">
-                          <%= tag %>
-                        </a>
-                      <% }) %>
-                    </div>
+                  <p class="mb-1 text-sm"><%= post.preview %></p>
+                  <div>
+                    <% post.tags.forEach(function(tag) { %>
+                      <a href="/blog/tag/<%= tag %>"
+                         class="bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-300 inline-block"
+                         onclick="event.stopPropagation();">
+                        <%= tag %>
+                      </a>
+                    <% }) %>
                   </div>
                 </div>
               </a>
             </div>
+
+
           <% }); %>
         </div>
         <!-- Footer --->

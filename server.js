@@ -675,10 +675,6 @@ app.get('/admin', (req, res) => {
 	res.render('login', {errorMessage});
 });
 
-// Render gallery
-app.get('/gallery', (req, res) => {
-    res.render('gallery');
-});
 
 // Render portfolio 
 app.get('/portfolio', (req, res) => {
