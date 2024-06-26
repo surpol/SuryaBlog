@@ -4,11 +4,18 @@
 <head>
     <title>suryapolina.com</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Include Tailwind CSS from CDN for styling -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
     <link rel="stylesheet" type="text/css" href="/static/styles.css" />
     <link rel="icon" type="image/png" href="/images/favicon.ico">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/draggabilly/3.0.0/draggabilly.pkgd.min.js"></script>
+    <style>
+        .masonry-grid-item {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
 </head>
 
 <body>
@@ -48,8 +55,6 @@
                 </div>
               </a>
             </div>
-
-
           <% }); %>
         </div>
         <!-- Footer --->
@@ -60,44 +65,61 @@
         </footer>
     </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
-<script>
-  // Function to check if all images have loaded
-  function imagesHaveLoaded() {
-    var images = document.images;
-    var loaded = true;
-    for (var i = 0; i < images.length; i++) {
-      if (!images[i].complete) {
-        loaded = false;
-        break;
-      }
-    }
-    return loaded;
-  }
-
-  // Initialize Masonry after all images have loaded
-  function initializeMasonry() {
-    if (imagesHaveLoaded()) {
-      var grid = document.querySelector('.masonry-grid');
-      grid.classList.remove('masonry-grid-hidden'); // Remove the 'masonry-grid-hidden' class to display the Masonry grid
-      new Masonry(grid, {
-        itemSelector: '.masonry-grid-item',
-          columnWidth: '.masonry-grid-item',
-          fitWidth: true,
-          gutter: 8 // This adds space between the items
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          initializeMasonry();
       });
-    } else {
-      // If not all images are loaded, check again after a short delay
-      setTimeout(initializeMasonry, 100);
-    }
-  }
 
-  // start process
-  document.addEventListener('DOMContentLoaded', (event) => {
-    initializeMasonry();
-  });
-</script>
+      function initializeMasonry() {
+          if (areThumbnailsLoaded()) {
+              setupMasonryGrid();
+          } else {
+              // If not all images are loaded, check again after a short delay
+              setTimeout(initializeMasonry, 100);
+          }
+      }
 
+      function areThumbnailsLoaded() {
+          return Array.from(document.images).every(image => image.complete);
+      }
 
+      function setupMasonryGrid() {
+          const grid = document.querySelector('.masonry-grid');
+          grid.classList.remove('masonry-grid-hidden'); // Display the Masonry grid
+
+          const msnry = new Masonry(grid, {
+              itemSelector: '.masonry-grid-item',
+              columnWidth: '.masonry-grid-item',
+              fitWidth: true,
+              gutter: 8 // Space between the items
+          });
+
+          // Initialize Draggabilly for each item
+          initializeDraggabilly(grid, msnry);
+      }
+
+      function initializeDraggabilly(grid, msnry) {
+          const draggableElems = grid.querySelectorAll('.masonry-grid-item');
+          draggableElems.forEach(itemElem => {
+              const draggie = new Draggabilly(itemElem);
+
+              // Bind drag events to Masonry
+              draggie.on('dragStart', () => {
+                  itemElem.style.zIndex = '2'; // Bring to the front
+              });
+
+              draggie.on('dragEnd', () => {
+                  itemElem.style.zIndex = '';
+                  msnry.layout(); // Re-layout Masonry
+              });
+
+              draggie.on('dragMove', () => {
+                  msnry.layout(); // Re-layout Masonry on move
+              });
+          });
+      }
+
+    </script>
 </body>
+
 </html>
