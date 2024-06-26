@@ -6,28 +6,40 @@
     <title>suryapolina.com</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="images/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="/static/styles.css" />
 </head>
-<body class="bg-gray-300">
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-4xl font-bold text-center mb-8">Portfolio</h1>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <!-- Placeholder for portfolio items -->
-            <% for(let i = 1; i <= 9; i++) { %>
-                <div class="bg-white rounded-lg overflow-hidden shadow-lg">
-                    <img src="https://via.placeholder.com/500x300" alt="Project <%= i %>" class="w-full h-auto">
-                    <div class="p-4">
-                        <h2 class="font-semibold text-lg">Project Title <%= i %></h2>
-                        <p class="text-gray-600">Short description or summary for Project <%= i %>.</p>
-                        <a href="/portfolio/project-<%= i %>" class="text-blue-600 hover:text-blue-800">Learn More</a>
+<body>
+    <div class="flex flex-col min-h-screen">
+        <header class="text-center py-5">
+            <div class="flex flex-col items-center">
+                <h1 class="text-3xl font-bold"><a href="/blog">Surya Polina</a></h1>
+            </div>
+            <nav class="mt-4">
+                <a href="/blog" class="text-blue-800 hover:text-blue-700 mx-2">Blog</a>
+                <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
+            </nav>
+        </header>
+        <div class="container mx-auto px-4 py-8 flex-grow">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <!-- Placeholder for portfolio items -->
+                <% for(let i = 1; i <= 1; i++) { %>
+                    <div class="bg-white shadow-lg mx-auto">
+                        <img src="images/favicon.ico" alt="Project <%= i %>" class="w-full h-40 object-cover">
+                        <div class="p-2">
+                            <h2 class="font-semibold text-md">Personal Website</h2>
+                            <a href="suryapolina.com" class="text-blue-600 hover:text-blue-800 text-sm">suryapolina.com</a>
+                        </div>
                     </div>
-                </div>
-            <% } %>
+                <% } %>
+            </div>
         </div>
+
+    <!-- Footer --->
+    <footer class="mt-auto" style="background-color: #fcfcfc;">
+            <div class="text-center py-5">
+                <p> thesuryapolina@gmail.com </p>
+            </div>
+        </footer>   
     </div>
-
-    <footer class="bg-white text-center p-4 absolute bottom-0 w-full">
-        <p>All rights reserved. &copy; Surya Polina</p>
-    </footer>
-
 </body>
 </html>
