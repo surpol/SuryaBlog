@@ -14,6 +14,7 @@
         .masonry-grid-item {
             position: relative;
             z-index: 1;
+            transition: none; /* Disable transitions to prevent layout thrashing */
         }
     </style>
 </head>
@@ -33,29 +34,29 @@
         <!-- Masonry Grid -->
         <!-- Add the 'masonry-grid-hidden' class to initially hide the Masonry grid -->
         <div class="masonry-grid masonry-grid-hidden">
-          <% posts.forEach(function(post, index) { %>
+            <% posts.forEach(function(post, index) { %>
             <!-- Adjust width and margin classes as needed -->
             <div class="masonry-grid-item">
-              <a href="/blog/<%= post.id %>" class="no-underline text-black">
-                <div class="bg-white shadow-lg hover:bg-blue-100 overflow-hidden p-3">
-                  <h2 class="text-lg font-bold"><%= post.title %></h2>
-                  <% if (post.imagePath) { %>
-                    <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full p-3">
-                  <% } %>
-                  <p class="mb-1 text-sm"><%= post.preview %></p>
-                  <div>
-                    <% post.tags.forEach(function(tag) { %>
-                      <a href="/blog/tag/<%= tag %>"
-                         class="bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-300 inline-block"
-                         onclick="event.stopPropagation();">
-                        <%= tag %>
-                      </a>
-                    <% }) %>
-                  </div>
-                </div>
-              </a>
+                <a href="/blog/<%= post.id %>" class="no-underline text-black">
+                    <div class="bg-white shadow-lg hover:bg-blue-100 overflow-hidden p-3">
+                        <h2 class="text-lg font-bold"><%= post.title %></h2>
+                        <% if (post.imagePath) { %>
+                        <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full p-3">
+                        <% } %>
+                        <p class="mb-1 text-sm"><%= post.preview %></p>
+                        <div>
+                            <% post.tags.forEach(function(tag) { %>
+                            <a href="/blog/tag/<%= tag %>"
+                                class="bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-300 inline-block"
+                                onclick="event.stopPropagation();">
+                                <%= tag %>
+                            </a>
+                            <% }) %>
+                        </div>
+                    </div>
+                </a>
             </div>
-          <% }); %>
+            <% }); %>
         </div>
         <!-- Footer --->
         <footer class="mt-auto" style="background-color: #fcfcfc;">
@@ -66,59 +67,74 @@
     </div>
 
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-          initializeMasonry();
-      });
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMasonry();
+        });
 
-      function initializeMasonry() {
-          if (areThumbnailsLoaded()) {
-              setupMasonryGrid();
-          } else {
-              // If not all images are loaded, check again after a short delay
-              setTimeout(initializeMasonry, 100);
-          }
-      }
+        function initializeMasonry() {
+            if (areThumbnailsLoaded()) {
+                setupMasonryGrid();
+            } else {
+                // If not all images are loaded, check again after a short delay
+                setTimeout(initializeMasonry, 100);
+            }
+        }
 
-      function areThumbnailsLoaded() {
-          return Array.from(document.images).every(image => image.complete);
-      }
+        function areThumbnailsLoaded() {
+            return Array.from(document.images).every(image => image.complete);
+        }
 
-      function setupMasonryGrid() {
-          const grid = document.querySelector('.masonry-grid');
-          grid.classList.remove('masonry-grid-hidden'); // Display the Masonry grid
+        function setupMasonryGrid() {
+            const grid = document.querySelector('.masonry-grid');
+            grid.classList.remove('masonry-grid-hidden'); // Display the Masonry grid
 
-          const msnry = new Masonry(grid, {
-              itemSelector: '.masonry-grid-item',
-              columnWidth: '.masonry-grid-item',
-              fitWidth: true,
-              gutter: 8 // Space between the items
-          });
+            const msnry = new Masonry(grid, {
+                itemSelector: '.masonry-grid-item',
+                columnWidth: '.masonry-grid-item',
+                fitWidth: true,
+                gutter: 8 // Space between the items
+            });
 
-          // Initialize Draggabilly for each item
-          initializeDraggabilly(grid, msnry);
-      }
+            // Initialize Draggabilly for each item
+            initializeDraggabilly(grid, msnry);
+        }
 
-      function initializeDraggabilly(grid, msnry) {
-          const draggableElems = grid.querySelectorAll('.masonry-grid-item');
-          draggableElems.forEach(itemElem => {
-              const draggie = new Draggabilly(itemElem);
+        function initializeDraggabilly(grid, msnry) {
+            const draggableElems = grid.querySelectorAll('.masonry-grid-item');
+            draggableElems.forEach(itemElem => {
+                const draggie = new Draggabilly(itemElem);
 
-              // Bind drag events to Masonry
-              draggie.on('dragStart', () => {
-                  itemElem.style.zIndex = '2'; // Bring to the front
-              });
+                // Bind drag events to Masonry
+                draggie.on('dragStart', () => {
+                    itemElem.style.zIndex = '2'; // Bring to the front
+                    itemElem.style.transition = 'none'; // Disable transition
+                });
 
-              draggie.on('dragEnd', () => {
-                  itemElem.style.zIndex = '';
-                  msnry.layout(); // Re-layout Masonry
-              });
+                draggie.on('dragEnd', () => {
+                    itemElem.style.zIndex = '';
+                    itemElem.style.transition = ''; // Re-enable transition
+                    msnry.layout(); // Re-layout Masonry
+                });
 
-              draggie.on('dragMove', () => {
-                  msnry.layout(); // Re-layout Masonry on move
-              });
-          });
-      }
+                // Throttle the dragMove event
+                draggie.on('dragMove', throttle(() => {
+                    msnry.layout(); // Re-layout Masonry on move
+                }, 50));
+            });
+        }
 
+        function throttle(fn, limit) {
+            let inThrottle;
+            return function () {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    fn.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            }
+        }
     </script>
 </body>
 
