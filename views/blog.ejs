@@ -48,7 +48,7 @@
                             <% post.tags.forEach(function(tag) { %>
                             <a href="/blog/tag/<%= tag %>"
                                 class="bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-300 inline-block"
-                                onclick="event.stopPropagation();">
+                                onclick="handleTagClick(event, '<%= tag %>')">
                                 <%= tag %>
                             </a>
                             <% }) %>
@@ -133,6 +133,27 @@
                     inThrottle = true;
                     setTimeout(() => inThrottle = false, limit);
                 }
+            }
+        }
+
+        function handleTagClick(event, tag) {
+            event.stopPropagation();
+            event.preventDefault();
+            // Handle the tag click here, e.g., navigate to the tag page
+            window.location.href = `/blog/tag/${tag}`;
+        }
+
+        // Add touch event listeners to handle mobile touch events
+        document.querySelectorAll('.masonry-grid-item a').forEach(item => {
+            item.addEventListener('touchstart', handleTouchEvent, false);
+            item.addEventListener('touchend', handleTouchEvent, false);
+        });
+
+        function handleTouchEvent(event) {
+            // Handle touch event here if needed
+            if (event.type === 'touchend') {
+                const link = event.currentTarget;
+                window.location.href = link.href;
             }
         }
     </script>
