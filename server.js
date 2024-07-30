@@ -12,7 +12,6 @@ const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
 const sharp = require('sharp'); // Make sure to have sharp installed (`npm install sharp`)
 const cheerio = require('cheerio');
-const axios = require('axios');
 
 const app = express();
 
