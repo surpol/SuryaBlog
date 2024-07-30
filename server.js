@@ -1,59 +1,3 @@
-/* 
-
-Post Schema
--------------------------------------------------
-	- ID
-	- Title
-	- Preview
-	- Text
-	- Thumbnail Image
-	- Date Published 
-
-Public API's
--------------------------------------------------
-	GET  	 ('/blog')
-	GET  	 ('/blog/:id')
-	GET  	 ('/blog/tag/:tagId')
-	POST 	 ('/blog/:id'/comment)
-	PUT 	 ('/blog/:id/comment/:id') 
-
-Private API's (Require Authentication)
--------------------------------------------------
-	GET    ('/post/:id')
-	DELETE ('/post/:id')
-	PUT 	 ('/post/:id')
-	POST   ('/post/submit')
-
-Login API's (Rate Limiting)
--------------------------------------------------
-	POST 	 ('/login') 
-
-Generate QR code with secret key
--------------------------------------------------
-(async () => {
-  const openFile = (await import('open')).default;
-
-  const otpauthUrl = speakeasy.otpauthURL({
-    secret: process.env.SECRET_BASE32,
-    label: encodeURIComponent('SuryaPolinaBlog:spolina'),
-    issuer: 'SuryaPolinaBlog',
-  });
-
-  // Specify the path where you want to save the QR code image
-  const qrImagePath = './QRCode.png';
-
-  // Generate QR code and save as an image
-  QRCode.toFile(qrImagePath, otpauthUrl, function(err) {
-    if (err) {
-      console.error('Error generating QR code', err);
-    } else {
-      console.log(`QR Code saved to ${qrImagePath}. Scan this with your TOTP app.`);
-      // Optionally, open the image file automatically with the default image viewer
-      openFile(qrImagePath);
-    }
-  });
-})(); */
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path'); // Add path module to handle file paths
@@ -68,6 +12,7 @@ const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
 const sharp = require('sharp'); // Make sure to have sharp installed (`npm install sharp`)
 const cheerio = require('cheerio');
+const axios = require('axios');
 
 const app = express();
 
@@ -722,3 +667,63 @@ const setup = async () => {
 }
 
 setup();
+
+
+
+/*** SCHEMA + NOTES
+
+Post Schema
+-------------------------------------------------
+	- ID
+	- Title
+	- Preview
+	- Text
+	- Thumbnail Image
+	- Date Published 
+
+Public API's (for reader)
+-------------------------------------------------
+	GET  	 ('/blog')
+	GET  	 ('/blog/:id')
+	GET  	 ('/blog/tag/:tagId')
+	POST 	 ('/blog/:id'/comment)
+	PUT 	 ('/blog/:id/comment/:id') 
+
+Private API's (Require Authentication) (for admin)
+-------------------------------------------------
+	GET    ('/post/:id')
+	DELETE ('/post/:id')
+	PUT 	 ('/post/:id')
+	POST   ('/post/submit')
+
+Login API's (Rate Limiting)
+-------------------------------------------------
+	POST 	 ('/login') 
+
+Generate QR code with secret key
+-------------------------------------------------
+(async () => {
+  const openFile = (await import('open')).default;
+
+  const otpauthUrl = speakeasy.otpauthURL({
+    secret: process.env.SECRET_BASE32,
+    label: encodeURIComponent('SuryaPolinaBlog:spolina'),
+    issuer: 'SuryaPolinaBlog',
+  });
+
+  // Specify the path where you want to save the QR code image
+  const qrImagePath = './QRCode.png';
+
+  // Generate QR code and save as an image
+  QRCode.toFile(qrImagePath, otpauthUrl, function(err) {
+    if (err) {
+      console.error('Error generating QR code', err);
+    } else {
+      console.log(`QR Code saved to ${qrImagePath}. Scan this with your TOTP app.`);
+      // Optionally, open the image file automatically with the default image viewer
+      openFile(qrImagePath);
+    }
+  });
+})(); 
+
+***/
