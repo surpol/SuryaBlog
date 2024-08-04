@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>suryapolina.com</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Explore Surya Polina's website on technology, finance, and personal growth.">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles.css" />
+    <link rel="icon" type="image/png" href="/images/favicon.ico">
+</head>
+
+<body class="bg-gray-100">
+    <!-- Header -->
+    <div class="flex flex-col min-h-screen">
+        <header class="text-center py-5">
+            <div class="container mx-auto flex flex-col items-center">
+                <div class="flex flex-col items-center">
+                    <h1 class="text-3xl font-bold"><a href="/home">Surya Polina</a></h1>
+                </div>
+                <nav class="mt-4">
+                    <a href="/home" class="text-blue-800 hover:text-blue-700 mx-2">Home</a>
+                    <a href="/blog" class="text-blue-800 hover:text-blue-700 mx-2">Blog</a>
+                    <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
+                </nav>
+            </div>
+        </header>
+        <!-- Main Content -->
+        <div class="container mx-auto px-4 py-8 flex-grow">
+            <div class="grid gap-6 max-w-3xl mx-auto">
+                <img class="profile-picture mx-auto" src="/images/self.jpg" alt="Profile Picture"> 
+                <!-- About Me Section -->
+                <div class="section">
+                    <h2 class="text-lg font-bold">About Me</h2>
+                    <p>Hi! I'm Surya. I'm passionate about technology and exploring new and existing ideas. I enjoy writing about various topics such as technology, finance, and my personal journey. In my free time, I love playing basketball and staying updated on trends in technology.</p>
+                </div>
+                <!-- Experience Section -->
+                <div class="section">
+                    <h2 class="text-lg font-bold">Experience</h2>
+                    <p>I'm a software engineer with experience in web development and cloud technologies. My professional experience is comprised of enterprise backend development. I have an interest in building elegant, scalable, and efficient applications.</p>
+                </div>
+                <!-- Contact Section -->
+                <div class="section">
+                    <h2 class="text-lg font-bold">Contact</h2>
+                    <p><a href="mailto:thesuryapolina@gmail.com" class="email-link">thesuryapolina@gmail.com</a></p>
+                </div>
+            </div>
+        </div>
+        <!-- Footer -->
+        <footer class="bg-white text-center py-5 shadow">
+            <p>&copy; <span id="year"></span> Surya Polina</p>
+        </footer>
+    </div>
+    <script>
+        // Script to automatically update the year
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>

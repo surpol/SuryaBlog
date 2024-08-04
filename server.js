@@ -85,7 +85,29 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-/* ------------ Public APIs ------------ */
+/* ------------ REST API ------------ */
+
+// Render home as default route
+app.get('/', (req, res) => {
+  res.redirect('/home');
+});
+
+// Render home
+app.get('/home', (req, res) => {
+  res.render('home');
+});
+
+// Render login
+app.get('/admin', (req, res) => {
+	const errorMessage = "";
+	res.render('login', {errorMessage});
+});
+
+
+// Render portfolio 
+app.get('/portfolio', (req, res) => {
+    res.render('portfolio');
+});
 
 // Public | Render Blog & Retrieve All Posts 
 app.get('/blog', async (req, res) => {
@@ -605,24 +627,6 @@ app.post('/login', loginRateLimiter, (req, res) => {
       const errorMessage = 'Incorrect Username';
 			res.render('login', { errorMessage }); // Pass the errorMessage to the template
   	}
-});
-
-
-// Render blog
-app.get('/', (req, res) => {
-  res.redirect('/blog');
-});
-
-// Render login
-app.get('/admin', (req, res) => {
-	const errorMessage = "";
-	res.render('login', {errorMessage});
-});
-
-
-// Render portfolio 
-app.get('/portfolio', (req, res) => {
-    res.render('portfolio');
 });
 
 /*

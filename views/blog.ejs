@@ -9,24 +9,16 @@
     <link rel="stylesheet" type="text/css" href="/static/styles.css" />
     <link rel="icon" type="image/png" href="/images/favicon.ico">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/draggabilly/3.0.0/draggabilly.pkgd.min.js"></script>
-    <style>
-        .masonry-grid-item {
-            position: relative;
-            z-index: 1;
-            transition: none; /* Disable transitions to prevent layout thrashing */
-        }
-    </style>
 </head>
-
 <body>
     <!-- Header --->
     <div class="flex flex-col min-h-screen">
         <header class="text-center py-5">
             <div class="flex flex-col items-center">
-                <h1 class="text-3xl font-bold"><a href="/blog">Surya Polina</a></h1>
+                <h1 class="text-3xl font-bold"><a href="/home">Surya Polina</a></h1>
             </div>
             <nav class="mt-4">
+                <a href="/home" class="text-blue-800 hover:text-blue-700 mx-2">Home</a>
                 <a href="/blog" class="text-blue-800 hover:text-blue-700 mx-2">Blog</a>
                 <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
             </nav>
@@ -61,7 +53,7 @@
         <!-- Footer --->
         <footer class="mt-auto" style="background-color: #fcfcfc;">
             <div class="text-center py-5">
-                <p> thesuryapolina@gmail.com </p>
+                <p>&copy; <span id="year"></span> Surya Polina</p>
             </div>
         </footer>
     </div>
@@ -95,45 +87,7 @@
                 gutter: 8 // Space between the items
             });
 
-            // Initialize Draggabilly for each item
-            // initializeDraggabilly(grid, msnry);
-        }
-
-        // function initializeDraggabilly(grid, msnry) {
-        //     const draggableElems = grid.querySelectorAll('.masonry-grid-item');
-        //     draggableElems.forEach(itemElem => {
-        //         const draggie = new Draggabilly(itemElem);
-
-        //         // Bind drag events to Masonry
-        //         draggie.on('dragStart', () => {
-        //             itemElem.style.zIndex = '2'; // Bring to the front
-        //             itemElem.style.transition = 'none'; // Disable transition
-        //         });
-
-        //         draggie.on('dragEnd', () => {
-        //             itemElem.style.zIndex = '';
-        //             itemElem.style.transition = ''; // Re-enable transition
-        //             msnry.layout(); // Re-layout Masonry
-        //         });
-
-        //         // Throttle the dragMove event
-        //         draggie.on('dragMove', throttle(() => {
-        //             msnry.layout(); // Re-layout Masonry on move
-        //         }, 50));
-        //     });
-        // }
-
-        function throttle(fn, limit) {
-            let inThrottle;
-            return function () {
-                const args = arguments;
-                const context = this;
-                if (!inThrottle) {
-                    fn.apply(context, args);
-                    inThrottle = true;
-                    setTimeout(() => inThrottle = false, limit);
-                }
-            }
+        
         }
 
         function handleTagClick(event, tag) {
@@ -156,6 +110,9 @@
                 window.location.href = link.href;
             }
         }
+
+        // Script to automatically update the year
+        document.getElementById('year').textContent = new Date().getFullYear();
     </script>
 </body>
 
