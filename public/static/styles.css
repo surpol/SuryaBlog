@@ -27,3 +27,46 @@ body{
     border-radius: 3px;
 }
 
+
+.section {
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px; /* Ensures all sections have the same max width */
+  box-sizing: border-box; /* Includes padding and border in width and height calculations */
+  text-align: left; /* Aligns text to the left for consistency */
+  margin-bottom: 20px; /* Space between sections */
+}
+
+.section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.section p {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0; /* Ensures no additional margin beyond the section's own margin */
+}
+
+.email-link {
+  color: #1da1f2;
+  text-decoration: none;
+}
+
+.email-link:hover {
+  text-decoration: underline;
+}
+
+.profile-picture {
+  width: 200px; /* Set the desired width */
+  height: 200px; /* Set the desired height */
+  border-radius: 50%; /* Makes the image circular */
+  object-fit: cover; /* Ensures the image covers the entire area without stretching */
+  border: 2px solid #fff; /* Optional: adds a white border around the image */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow for depth */
+  margin-bottom: 20px; /* Adds some spacing below the image */
+}
+
