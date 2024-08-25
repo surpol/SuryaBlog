@@ -11,25 +11,22 @@
 </head>
 
 <body>
-  <div class="flex flex-col min-h-screen">
   <!-- Header -->
-    <header class="text-center py-5">
-        <div class="flex flex-col items-center">
-            <h1 class="text-3xl font-bold"><a href="/home">Surya Polina</a></h1>
-        </div>
-        <nav class="mt-4">
-            <a href="/home" class="text-blue-800 hover:text-blue-700 mx-2">Home</a>
-            <a href="/blog" class="text-blue-800 hover:text-blue-700 mx-2">Blog</a>
-            <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
-        </nav>
-    </header>
+  <header class="text-center py-5">
+      <h1 class="text-3xl font-bold"><a href="/home">Surya Polina</a></h1>
+      <nav class="mt-4">
+          <a href="/home" class="text-blue-800 hover:text-blue-400 mx-2">Home</a>
+          <a href="/blog" class="text-blue-800 hover:text-blue-400 mx-2">Blog</a>
+          <a href="/portfolio" class="text-blue-800 hover:text-blue-400 mx-2">Portfolio</a>
+      </nav>
+  </header>
   <!-- Grid Container -->
   <div class="container mx-auto px-4 py-6">
     <div class="grid md:grid-cols-3 gap-4">
       <!-- Post Article -->
-      <article class="md:col-span-2 bg-white overflow-hidden mb-6 p-3">
-        <h1 class="text-3xl font-bold text-center my-4"><%= post.title %></h1>
-        <p class="text-gray-500 text-center mb-1">
+      <article class="md:col-span-2 bg-white overflow-hidden p-4">
+        <h1 class="text-2xl font-bold my-4 text-center"><%= post.title %></h1>
+        <p class="text-gray-500 mb-1 text-center">
           <%= new Date(post.date_created).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) %>
         </p>
         <div class="prose lg:prose-xl p-4">
@@ -37,7 +34,7 @@
         </div>
       </article>
       <!-- Comment Form, initially hidden, revealed upon clicking the 'Post comment' input -->
-      <div class="md:col-span-1 w-full">
+      <div class="w-full">
         <div id="comment-trigger" class="mb-4 bg-white p-1">
           <input 
             type="text" 
@@ -91,13 +88,10 @@
               </div>
             </div>
           <% }); %>
-
         </div>
 
       </div>
     </div>
-
-  </div>
 
   <script>
 

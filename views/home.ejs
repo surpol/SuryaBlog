@@ -22,9 +22,9 @@
                     <h1 class="text-3xl font-bold"><a href="/home">Surya Polina</a></h1>
                 </div>
                 <nav class="mt-4">
-                    <a href="/home" class="text-blue-800 hover:text-blue-700 mx-2">Home</a>
-                    <a href="/blog" class="text-blue-800 hover:text-blue-700 mx-2">Blog</a>
-                    <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
+                    <a href="/home" class="text-blue-800 hover:text-blue-400 mx-2">Home</a>
+                    <a href="/blog" class="text-blue-800 hover:text-blue-400 mx-2">Blog</a>
+                    <a href="/portfolio" class="text-blue-800 hover:text-blue-400 mx-2">Portfolio</a>
                 </nav>
             </div>
         </header>
@@ -33,31 +33,28 @@
             <div class="grid gap-6 max-w-3xl mx-auto">
                 <img class="profile-picture mx-auto" src="/images/self.jpg" alt="Profile Picture"> 
                 <!-- About Me Section -->
-                <div class="section">
-                    <h2 class="text-lg font-bold">About Me</h2>
-                    <p>Hi! I'm Surya. I'm passionate about technology and exploring new and existing ideas. I enjoy writing about various topics such as technology, finance, and my personal journey. In my free time, I love playing basketball and staying updated on trends in technology.</p>
-                </div>
-                <!-- Experience Section -->
-                <div class="section">
-                    <h2 class="text-lg font-bold">Experience</h2>
-                    <p>I'm a software engineer with experience in web development and cloud technologies. My professional experience is comprised of enterprise backend development. I have an interest in building elegant, scalable, and efficient applications.</p>
-                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-center">About</h2>
+                    <p> Hey I'm Surya. I am an aspiring web developer. My current level of experience resides in the enterprise backend development. 
+                        However my passion lies in building powerful, beautiful web applications and web sites. 
+                        Currently I have one client, and like any journey we start at the beginning 
+                        The purpose of this website is to market myself by writing about topics pertaining to the craft, 
+                        plus some other stuff to give you an idea of who I am. My writings are only generated from my keys.
+                        As you may notice it currently consists random content. Overtime I hope to narrow it's focus. 
+                </div>            
                 <!-- Contact Section -->
-                <div class="section">
-                    <h2 class="text-lg font-bold">Contact</h2>
-                    <p><a href="mailto:thesuryapolina@gmail.com" class="email-link">thesuryapolina@gmail.com</a></p>
+                <div class="text-center">
+                    <a href="mailto:thesuryapolina@gmail.com" class="text-blue-800 hover:text-blue-700 mr-3">
+                        <i class="fas fa-envelope fa-lg"></i>
+                    </a>
+                    <a href="https://twitter.com/suryapolina" target="_blank" class="text-blue-800 hover:text-blue-700">
+                        <i class="fab fa-twitter fa-lg"></i>
+                    </a>
                 </div>
             </div>
         </div>
-        <!-- Footer -->
-        <footer class="bg-white text-center py-5 shadow">
-            <p>&copy; <span id="year"></span> Surya Polina</p>
-        </footer>
+
     </div>
-    <script>
-        // Script to automatically update the year
-        document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
 </body>
 
 </html>

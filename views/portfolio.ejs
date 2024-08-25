@@ -9,15 +9,13 @@
     <link rel="stylesheet" type="text/css" href="/static/styles.css" />
 </head>
 <body>
-    <div class="flex flex-col min-h-screen">
+    <div>
         <header class="text-center py-5">
-            <div class="flex flex-col items-center">
-                <h1 class="text-3xl font-bold"><a href="/home">Surya Polina</a></h1>
-            </div>
+            <h1 class="text-3xl font-bold"><a href="/home">Surya Polina</a></h1>
             <nav class="mt-4">
-                <a href="/home" class="text-blue-800 hover:text-blue-700 mx-2">Home</a>
-                <a href="/blog" class="text-blue-800 hover:text-blue-700 mx-2">Blog</a>
-                <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
+                <a href="/home" class="text-blue-800 hover:text-blue-400 mx-2">Home</a>
+                <a href="/blog" class="text-blue-800 hover:text-blue-400 mx-2">Blog</a>
+                <a href="/portfolio" class="text-blue-800 hover:text-blue-400 mx-2">Portfolio</a>
             </nav>
         </header>
         <div class="container mx-auto px-4 py-8 flex-grow">
@@ -25,10 +23,10 @@
                 <!-- Placeholder for portfolio items -->
                 <% for(let i = 1; i <= 1; i++) { %>
                     <a href="/home" class="no-underline text-black">
-                        <div class="bg-white shadow-lg hover:bg-blue-100 overflow-hidden p-2 max-w-xs mx-auto">
+                        <div class="bg-white hover:bg-blue-100 overflow-hidden p-2 max-w-xs mx-auto">
                             <img src="images/favicon.ico" alt="Project <%= i %>" class="w-40 h-40 object-cover mx-auto">
                             <div class="p-2 text-left">
-                                <h2 class="font-semibold text-sm">Personal Website</h2>
+                                <h2 class="font-semibold text-sm">My Website</h2>
                                 <a href="https://suryapolina.com" class="text-blue-600 hover:text-blue-800 text-xs">suryapolina.com</a>
                             </div>
                         </div>
@@ -36,18 +34,7 @@
                 <% } %>
             </div>
         </div>
-        
 
-        <!-- Footer --->
-        <footer class="mt-auto" style="background-color: #fcfcfc;">
-            <div class="text-center py-5">
-                <p>&copy; <span id="year"></span> Surya Polina</p>
-            </div>
-        </footer>
     </div>
-    <script>
-        // Script to automatically update the year
-        document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
 </body>
 </html>

@@ -12,6 +12,9 @@ const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
 const sharp = require('sharp'); // Make sure to have sharp installed (`npm install sharp`)
 const cheerio = require('cheerio');
+const NodeCache = require('node-cache');
+// Cache entries expire after 60 seconds (adjust as needed)
+const viewCache = new NodeCache({ stdTTL: 360 }); 
 
 const app = express();
 
@@ -85,31 +88,26 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-/* ------------ REST API ------------ */
-
-// Render home as default route
+// Default route
 app.get('/', (req, res) => {
   res.redirect('/home');
 });
 
-// Render home
 app.get('/home', (req, res) => {
   res.render('home');
 });
 
-// Render login
 app.get('/admin', (req, res) => {
 	const errorMessage = "";
 	res.render('login', {errorMessage});
 });
 
 
-// Render portfolio 
 app.get('/portfolio', (req, res) => {
     res.render('portfolio');
 });
 
-// Public | Render Blog & Retrieve All Posts 
+// Render blog & get all posts 
 app.get('/blog', async (req, res) => {
   try {
     const db = await dbPromise;
@@ -138,19 +136,33 @@ app.get('/blog', async (req, res) => {
   }
 });
 
-// Public | Retrieve Post by Id
+// Get blog by ID with view count tracking
 app.get('/blog/:id', async (req, res) => {
   const db = await dbPromise;
+  const postId = req.params.id;
+  const userIp = req.ip; // Get the user's IP address
+
   try {
-    const postId = req.params.id;
     // Fetch the post from the Posts table
     const post = await db.get("SELECT * FROM Posts WHERE id = ?", postId);
-    
+
     if (post) {
+      // Track the view count if the user hasn't viewed it recently
+      const cacheKey = `view_${postId}_${userIp}`;
+      const alreadyViewed = viewCache.get(cacheKey);
+
+      if (!alreadyViewed) {
+        // Increment the view count because this IP has not viewed the post recently
+        await db.run("UPDATE Posts SET views = views + 1 WHERE id = ?", postId);
+
+        // Set the cache entry for this IP and post to prevent further increments within the TTL
+        viewCache.set(cacheKey, true);
+      }
+
       // Fetch associated comments from the Comments table
       const comments = await db.all("SELECT * FROM Comments WHERE postId = ? ORDER BY created_at DESC", postId);
 
-      // Load the post content into cheerio for manipulation
+      // Load the post content into Cheerio for HTML manipulation
       const $ = cheerio.load(post.text);
 
       // Apply Tailwind CSS classes to h1 tags
@@ -159,18 +171,20 @@ app.get('/blog/:id', async (req, res) => {
       // Update the post content with styled elements
       post.text = $.html();
 
+      // Render the post with comments and views
       res.render('post', { post, comments });
     } else {
       // If no post was found, send a 404 error
-      res.status(404).send('Post not found');
+      res.status(404).render('404', { message: 'Post not found' });
     }
   } catch (error) {
     console.error('Database query error:', error.message);
-    res.status(500).send('Error fetching post and/or comments');
+    res.status(500).render('500', { message: 'Error fetching post and/or comments' });
   }
 });
 
-// Public | Retrieve Posts with custom tag
+
+// Retrieve blog with tag
 app.get('/blog/tag/:tagId', async (req, res) => {
   try {
     const db = await dbPromise;
@@ -193,7 +207,7 @@ app.get('/blog/tag/:tagId', async (req, res) => {
   }
 });
 
-// New Comment with Optional Password
+// New comment with optional password
 app.post('/blog/:id/comment', upload.none(), async (req, res) => {
   const { email, name, comment, password } = req.body;
   const postId = req.params.id;
@@ -222,7 +236,7 @@ app.post('/blog/:id/comment', upload.none(), async (req, res) => {
   }
 });
 
-// Function to verify comment password if it exists
+// Verify comment password, if it exists
 async function verifyOptionalCommentPassword(commentId, providedPassword) {
   const db = await dbPromise;
   const comment = await db.get('SELECT password FROM Comments WHERE id = ?', [commentId]);
@@ -249,7 +263,7 @@ async function verifyOptionalCommentPassword(commentId, providedPassword) {
   return { success: false, message: 'Password is required for this comment' };
 }
 
-// Update Comment with Password Verification
+// Update comment with password verification
 app.put('/blog/:postId/comment/:commentId', upload.none(), async (req, res) => {
   const { comment, password } = req.body;
   const { postId, commentId } = req.params;
@@ -276,7 +290,7 @@ app.put('/blog/:postId/comment/:commentId', upload.none(), async (req, res) => {
   }
 });
 
-// Delete Comment with Password Verification
+// Delete comment with password verification
 app.delete('/blog/:postId/comment/:commentId', upload.none(), async (req, res) => {
   const { password } = req.body;
   const { postId, commentId } = req.params;
@@ -304,7 +318,7 @@ app.delete('/blog/:postId/comment/:commentId', upload.none(), async (req, res) =
   }
 });
 
-// Function to update a comment by ID
+// Update a comment by ID
 async function updateCommentById(commentId, newCommentText, postId) {
 	console.log("Updating comment...");
   try {
@@ -322,7 +336,7 @@ async function updateCommentById(commentId, newCommentText, postId) {
   }
 }
 
-// Function to update a comment by ID
+// Update a comment by ID
 async function deleteCommentById(commentId, postId) {
 	console.log("Deleting comment...");
   try {
@@ -671,62 +685,3 @@ const setup = async () => {
 
 setup();
 
-
-
-/*** SCHEMA + NOTES
-
-Post Schema
--------------------------------------------------
-	- ID
-	- Title
-	- Preview
-	- Text
-	- Thumbnail Image
-	- Date Published 
-
-Public API's (for reader)
--------------------------------------------------
-	GET  	 ('/blog')
-	GET  	 ('/blog/:id')
-	GET  	 ('/blog/tag/:tagId')
-	POST 	 ('/blog/:id'/comment)
-	PUT 	 ('/blog/:id/comment/:id') 
-
-Private API's (Require Authentication) (for admin)
--------------------------------------------------
-	GET    ('/post/:id')
-	DELETE ('/post/:id')
-	PUT 	 ('/post/:id')
-	POST   ('/post/submit')
-
-Login API's (Rate Limiting)
--------------------------------------------------
-	POST 	 ('/login') 
-
-Generate QR code with secret key
--------------------------------------------------
-(async () => {
-  const openFile = (await import('open')).default;
-
-  const otpauthUrl = speakeasy.otpauthURL({
-    secret: process.env.SECRET_BASE32,
-    label: encodeURIComponent('SuryaPolinaBlog:spolina'),
-    issuer: 'SuryaPolinaBlog',
-  });
-
-  // Specify the path where you want to save the QR code image
-  const qrImagePath = './QRCode.png';
-
-  // Generate QR code and save as an image
-  QRCode.toFile(qrImagePath, otpauthUrl, function(err) {
-    if (err) {
-      console.error('Error generating QR code', err);
-    } else {
-      console.log(`QR Code saved to ${qrImagePath}. Scan this with your TOTP app.`);
-      // Optionally, open the image file automatically with the default image viewer
-      openFile(qrImagePath);
-    }
-  });
-})(); 
-
-***/

@@ -9,39 +9,34 @@
     <link rel="stylesheet" type="text/css" href="/static/styles.css" />
 </head>
 <body>
-    <div class="flex flex-col min-h-screen">
-    	 <!----Header---->
-        <header class="text-center py-5">
-            <div class="flex flex-col items-center">
-                <h1 class="text-3xl font-bold"><a href="/blog">Surya Polina</a></h1>
-            </div>
-            <nav class="mt-4">
-                <a href="/home" class="text-blue-800 hover:text-blue-700 mx-2">Home</a>
-                <a href="/blog" class="text-blue-800 hover:text-blue-700 mx-2">Blog</a>
-                <a href="/portfolio" class="text-blue-800 hover:text-blue-700 mx-2">Portfolio</a>
-            </nav>
-            <section class="text-center py-5">
-                <h2 class="text-3xl font-bold">tag: [<%= tagName %>]</h2>
-            </section>
-        </header>
-        <!----Grid---->
-        <div class="masonry-grid"  data-masonry-options='{ "isFitWidth": true }'>
-            <% posts.forEach(function(post, index) { %>
-                <div class="masonry-grid-item">
-                	<a href="/blog/<%= post.id %>" class="no-underline text-black">
-                        <div class="bg-white shadow-lg hover:bg-blue-100 cursor-pointer overflow-hidden p-3">
-                            <h2 class="text-xl font-bold"><%= post.title %></h2>
-                            <% if (post.imagePath) { %>
-                                <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full p-3">
-                            <% } %>
-                            <div>
-                                <p class="mb-1 text-sm"><%= post.preview %></p> <!-- Adjust bottom margin and font size as needed -->
-                                <p class="text-gray-500 mb-1 text-xs"><%= new Date(post.date_created).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) %></p> <!-- Adjust bottom margin and font size as needed -->
-                            </div>
+    <!----Header---->
+    <header class="text-center py-5">
+      <h1 class="text-3xl font-bold"><a href="/blog">Surya Polina</a></h1>
+        <nav class="mt-4">
+            <a href="/home" class="text-blue-800 hover:text-blue-400 mx-2">Home</a>
+            <a href="/blog" class="text-blue-800 hover:text-blue-400 mx-2">Blog</a>
+            <a href="/portfolio" class="text-blue-800 hover:text-blue-400 mx-2">Portfolio</a>
+        </nav>
+        <section class="text-center py-5">
+            <h2 class="text-3xl font-bold">tag: [<%= tagName %>]</h2>
+        </section>
+    </header>
+    <!----Grid---->
+    <div class="masonry-grid mx-auto"  data-masonry-options='{ "isFitWidth": true }'>
+        <% posts.forEach(function(post, index) { %>
+            <div class="masonry-grid-item">
+              <a href="/blog/<%= post.id %>" class="no-underline text-black">
+                    <div class="bg-white hover:bg-blue-100 cursor-pointer overflow-hidden p-3 mb-1">
+                        <h2 class="text-xl font-bold"><%= post.title %></h2>
+                        <% if (post.imagePath) { %>
+                            <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full p-3">
+                        <% } %>
+                        <div>
+                            <p class="mb-1 text-sm"><%= post.preview %></p> <!-- Adjust bottom margin and font size as needed -->
                         </div>
-                </div>
-            <% }); %>
-        </div>
+                    </div>
+            </div>
+        <% }); %>
     </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
