@@ -1,3 +1,1 @@
-Run Locally
-
-1. ./SuryaBlog nodemon start
+Surya Polina's Domain
