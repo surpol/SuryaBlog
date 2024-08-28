@@ -90,11 +90,11 @@ const verifyToken = (req, res, next) => {
 
 // Default route
 app.get('/', (req, res) => {
-  res.redirect('/home');
+  res.redirect('/blog');
 });
 
-app.get('/home', (req, res) => {
-  res.render('home');
+app.get('/about', (req, res) => {
+  res.render('about');
 });
 
 app.get('/admin', (req, res) => {
