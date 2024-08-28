@@ -100,9 +100,11 @@
             if (currentLanguage === 'en') {
                 currentLanguage = 'es';
                 this.innerText = 'English';
+                document.getElementById('more-info-toggle').innerText = 'Más sobre mí';
             } else {
                 currentLanguage = 'en';
                 this.innerText = 'Español';
+                document.getElementById('more-info-toggle').innerText = 'More about me';
             }
 
             // Update the text visibility
@@ -123,7 +125,6 @@
                 }
             }
         });
-
         // Toggle for more information section
         document.getElementById('more-info-toggle').addEventListener('click', function() {
             const moreInfoSection = document.getElementById('more-info-section');
