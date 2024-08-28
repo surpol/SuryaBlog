@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,33 +9,37 @@
     <link rel="icon" type="image/png" href="images/favicon.ico">
     <link rel="stylesheet" type="text/css" href="/static/styles.css" />
 </head>
+
 <body>
     <div>
         <header class="text-center py-5">
-            <h1 class="text-3xl font-bold"><a href="/home">Surya Polina</a></h1>
+            <h1 class="text-3xl font-bold"><a href="/blog">Surya Polina</a></h1>
             <nav class="mt-4">
                 <a href="/home" class="text-blue-800 hover:text-blue-400 mx-2">Home</a>
                 <a href="/blog" class="text-blue-800 hover:text-blue-400 mx-2">Blog</a>
                 <a href="/portfolio" class="text-blue-800 hover:text-blue-400 mx-2">Portfolio</a>
             </nav>
         </header>
-        <div class="container mx-auto px-4 py-8 flex-grow">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <!-- Placeholder for portfolio items -->
-                <% for(let i = 1; i <= 1; i++) { %>
-                    <a href="/home" class="no-underline text-black">
-                        <div class="bg-white hover:bg-blue-100 overflow-hidden p-2 max-w-xs mx-auto">
-                            <img src="images/favicon.ico" alt="Project <%= i %>" class="w-40 h-40 object-cover mx-auto">
-                            <div class="p-2 text-left">
-                                <h2 class="font-semibold text-sm">My Website</h2>
-                                <a href="https://suryapolina.com" class="text-blue-600 hover:text-blue-800 text-xs">suryapolina.com</a>
-                            </div>
-                        </div>
-                    </a>
-                <% } %>
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 gap-4">
+                <!-- Portfolio items -->
+                <a href="https://suryapolina.com" class="no-underline text-black flex items-center bg-white hover:bg-blue-100 overflow-hidden w-96 mx-auto">
+                    <img src="images/favicon.ico" alt="Project 1" class="w-36 h-36 object-cover flex-shrink-0">
+                    <div class="ml-4">
+                        <h2 class="font-semibold text-lg">Personal Website</h2>
+                        <p class="text-blue-600 hover:text-blue-800 text-sm">suryapolina.com</p>
+                    </div>
+                </a>
+                <a href="https://southernrentalcars.com" class="no-underline text-black flex items-center bg-white hover:bg-blue-100 overflow-hidden w-96 mx-auto">
+                    <img src="images/southernrentalcars.jpg" alt="Project 2" class="w-36 h-36 object-cover flex-shrink-0">
+                    <div class="ml-4">
+                        <h2 class="font-semibold text-lg">Southern Rental Cars (In Progress)</h2>
+                        <p class="text-blue-600 hover:text-blue-800 text-sm">southernrentalcars.com</p>
+                    </div>
+                </a>
             </div>
         </div>
-
     </div>
 </body>
+
 </html>
