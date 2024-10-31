@@ -26,65 +26,51 @@
         </div>
     </header>
     <!-- Main Content -->
-    <div class="container mx-auto px-4 py-6">
+    <div class="container mx-auto px-4 py-6 rounded rounded-md">
         <div class="grid gap-6 max-w-3xl mx-auto">
             <img class="profile-picture mx-auto" src="/images/self.jpg" alt="Profile Picture"> 
             <!-- About Me Section -->
-            <div class="p-4 text-black bg-white border border-blue-300">
+            <div id="about-me-card" class="p-4 text-black bg-blue-100 rounded-2xl hover:bg-blue-200 cursor-pointer">
                 <!-- English Paragraph -->
                 <p id="about-text-en" class="text-left"> 
-                    Hey! Thanks for clicking. I'm Surya if you couldn't already guess. 
-                    I am a web developer. My professional experience is with the enterprise backend development. 
-                    But my passion lies is building powerful, aesthetic full stack web applications. 
-                    Like any journey we must start at the beginning.
-                    The purpose of this website is to market myself and write about topics related to the craft. 
-                    Words are generated from only my head and fingers.
-                    My content is a bit flexible at the moment. 
-                    Overtime I expect to narrow down it's focus. 
+                    I am a web developer. I like sports. I like the ravens and cavs. I like pancakes. I like pineapples. And mostly, I like my computer.
+                    My posts are generated from my fingers
+                    My content will range from a variety of things.
+                    I expect to narrow it's focus. 
                 </p>
                 <!-- Spanish Paragraph -->
                 <p id="about-text-es" class="text-left hidden"> 
-                    ¡Hola! Gracias por hacer clic. Soy Surya, si no lo adivinaste ya. 
-                    Soy desarrollador web. Mi experiencia profesional reside en el desarrollo de backend empresarial. 
-                    Pero mi pasión reside en construir aplicaciones web full stack poderosas y hermosas. 
-                    Actualmente tengo un cliente; como cualquier viaje, debemos comenzar desde el principio.
-                    El propósito de este sitio web es promocionarme y escribir sobre temas relacionados con el oficio. 
-                    Mis escritos son generados por mi cabeza y mis dedos.
-                    Es posible que hayas notado que mi contenido es un poco aleatorio 😊. 
-                    Eso es porque me gusta encontrar razones para escribir. Con el tiempo, espero enfocar mejor el contenido. 
-                    Continuaré haciendo actualizaciones a este sitio web y, con suerte, ganarme un lugar en tus marcadores. Mantente al tanto.
+                    Soy desarrollador web. Me gustan los deportes. Me gustan los Ravens y los Cavs. Me gustan los panqueques. Me gustan las piñas. Y, sobre todo, me gusta mi computadora.
+                    Mis publicaciones se generan con mis dedos.
+                    Mi contenido abarcará una variedad de temas.
+                    Espero enfocarlo en un tema más específico.
                 </p>
                 
                 <!-- Toggle for more information -->
-                <div class="mt-4">
-                    <button id="more-info-toggle" class="px-2 py-2 bg-blue-500 text-white w-full text-left">
-                        Learn more
-                    </button>
-                    <div id="more-info-section" class="hidden mt-4">
-                        <select id="question-select" class="border p-2 w-full mb-4">
-                            <option value="">ask about me</option>
+                <div id="qa" class="mt-2">
+                        <select id="question-select" class="border p-2 mb-3 rounded-2xl text-gray-500">
+                            <option>select question</option>
                         </select>
-                        <div id="answer" class="mt-4 text-gray-700"></div>
-                    </div>
+                        <div id="answer" class="text-gray-500"></div>
                 </div>
-            </div>      
+            </div>
+        </div>      
             
             <!-- Toggle Button -->
-            <div class="text-center"> <!-- Centering the button -->
-                <button id="translate-toggle" class="mt-4 px-2 py-2 bg-blue-500 text-white">
-                    Español
+            <div class="text-center mb-4"> <!-- Centering the button -->
+                <button id="translate-toggle" class="mt-4 px-2 py-2 bg-indigo-500 text-white rounded-xl text-sm">
+                    en español
                 </button>
             </div>      
             <!-- Contact Section -->
             <div class="text-center">
-                <a href="mailto:thesuryapolina@gmail.com" class="text-blue-800 hover:text-blue-700 mr-3">
+                <a href="mailto:thesuryapolina@gmail.com" class="text-gray-500 hover:text-blue-700 mr-3">
                     <i class="fas fa-envelope fa-lg"></i>
                 </a>
-                <a href="https://twitter.com/suryapolina" target="_blank" class="text-blue-800 hover:text-blue-700">
+                <a href="https://twitter.com/suryapolina" target="_blank" class="text-blue-500 hover:text-blue-700">
                     <i class="fab fa-twitter fa-lg"></i>
                 </a>
             </div>
-        </div>
     </div>
 
     <script>
@@ -96,119 +82,75 @@
             const englishText = document.getElementById('about-text-en');
             const spanishText = document.getElementById('about-text-es');
 
-            if (currentLanguage === 'en') {
-                currentLanguage = 'es';
-                this.innerText = 'English';
-                document.getElementById('more-info-toggle').innerText = 'Más sobre mí';
-            } else {
-                currentLanguage = 'en';
-                this.innerText = 'Español';
-                document.getElementById('more-info-toggle').innerText = 'More about me';
-            }
-
-            // Update the text visibility
+            // Toggle visibility of about text paragraphs
             englishText.classList.toggle('hidden');
             spanishText.classList.toggle('hidden');
 
-            populateQuestions();  // Populate questions in the new language
+            // Switch the language
+            currentLanguage = currentLanguage === 'en' ? 'es' : 'en';
+            
+            // Update button text to reflect the other language
+            this.innerText = currentLanguage === 'en' ? 'en español' : 'in english';
 
-            // Update selected question and answer if applicable
+            // Populate questions in the dropdown
+            populateQuestions();
+
+            // Update answer based on selected question
             if (selectedQuestion) {
-                const translatedQuestion = getTranslatedQuestion(selectedQuestion);
-                if (translatedQuestion) {
-                    document.getElementById('question-select').value = translatedQuestion;
-                    document.getElementById('answer').innerText = qa[currentLanguage][translatedQuestion];
-                } else {
-                    document.getElementById('question-select').value = '';
-                    document.getElementById('answer').innerText = '';
-                }
+                document.getElementById('answer').innerText = qa[currentLanguage][selectedQuestion] || '';
             }
         });
-        // Toggle for more information section
-        document.getElementById('more-info-toggle').addEventListener('click', function() {
-            const moreInfoSection = document.getElementById('more-info-section');
-            if (moreInfoSection.classList.contains('hidden')) {
-                moreInfoSection.classList.remove('hidden');
-            } else {
-                moreInfoSection.classList.add('hidden');
-            }
-        });
+
+        document.getElementById("about-me-card").addEventListener('clicker', function() {
+
+        })
 
         const qa = {
             en: {
-                "Favorite food?": "Cheeseburger for the salt and Pancakes for the sugar.",
-                "What are your hobbies?": "Basketball, programming, surfing the web, movies, cooking (more like responsbility)",
-                "Favorite movie?": "The Matrix or Toby Maguire's Spiderman due to nostalgia reason",
-                "What is the purpose of this website?": "To learn about me and hopefully my work.",
-                "Do you have a middle name?": "No but Surya Alexander Polina has a nice ring",
-                "What time is it?": getCurrentCentralTime() + " (Central Time)",
-                "Are you married?": "Nope. Dms are open",
-                "What is your favorite color?": "Olive Green",
-                "What is your all-time favorite video game?": "NBA 2K12, Pokemon Diamond",
-                "Can you dance?": "Kind of. I can wiggle.",
-                "What's your dream?": "To own a small/midsize software company with an great team. A family too.",
-                "What's your religion?": "Hinduism",
-                "Mornings or Nights?": "Nights",
-                "Dogs or cats?": "Dogs, love cats too",
-                "Something you wish you were good at?": "skating (any type)",
-                "Childhood celebrity crush?": "Hannah Montana",
-                "Favorite programming language?": "Java and Python",
-                "First phone?": "Sony Ericsson C905",
-                "Favorite app?": "Soundcloud",
-                "Favorite fruit?": "Pineapppplesss...",
-                "Favorite social media?": "Reddit and Bluesky",
-                "Favorite song?": "Money Trees by Kendrick Lamar",
-                "What was the most recent thing you read?": "An essay from Paul Graham",
-                "What got you into programming?": "Deciding to take computer science in college",
-                "Do you have any pets?": "Shih tzu and corn snake.",
-                "Fondest memory?": "Times in India.",
-                "What are your current goals?": "Upskill in web development, get stronger, and improve overrall organization.",
-                "What's your biggest fear?": "addictions, bad health, and loss",
-                "Where do you want to be in 10 years?": "With a healthy family and financial success",
-                "Where do you live?": "Dallas",
-                "Second favorite song?": "Superstar Lupe Fiasco",
-                "Pet peeves?": "Close-mindedness, ignorance, and backseat drivers.",
-                "Child idols?": "Kyrie Irving, Lamar Jackson, Lebron James, Spider-man.",
-                "Favorite teacher?": "The substitute teacher in second grade",
+                "favorite food?": "pancakes",
+                "hobbies?": "basketball, coding, browsing, movies, cooking",
+                "favorite movie?": "matrix",
+                "middle name?": "Surya Alexander Polina sounds nice",
+                "current time?": getCurrentCentralTime() + " (Central Time)",
+                "married?": "dms are still open",
+                "favorite color?": "green",
+                "video games?": "nba 2K12, pokemon, mostly mobile games now",
+                "dreams?": "entrepreneur",
+                "religion?": "hindu",
+                "morning or night?": "night",
+                "dogs or cats?": "dogs",
+                "celebrity crush?": "Naomi Scott",
+                "programming language?": "java, javascript",
+                "first phone?": "SE C905",
+                "favorite app?": "soundcloud",
+                "favorite fruit?": "pineapple",
+                "favorite song?": "money trees. cherish the day, superstar",
+                "where do you live?": "dallas",
+                "idols?": "Kyrie Irving, Lamar Jackson, Lebron James, Spider-man",
+                "grocery store?": "sprouts",
             },
             es: {
-                "¿Comida favorita?": "Hamburguesa con queso por la sal y panqueques por el azúcar.",
-                "¿Cuáles son tus pasatiempos?": "Baloncesto, programación, lectura, películas y, con suerte, pronto hacer videos (procrastinando).",
-                "¿Película favorita?": "Tiene que ser The Matrix o Spiderman de Toby Maguire por pura nostalgia.",
-                "¿Cuál es el propósito de este sitio web?": "Aprender sobre mí y, con suerte, mi trabajo.",
-                "¿Tienes segundo nombre?": "No. Mi primer nombre fue lo suficientemente bueno.",
-                "¿Qué hora es?": getCurrentCentralTime() + " (Hora Central)",
-                "¿Estás casado?": "No. Dms están abiertos :)",
-                "¿Cuál es tu color favorito?": "Verde oliva",
-                "¿Cuál es tu videojuego favorito de todos los tiempos?": "NBA 2K12, Pokémon Diamante",
-                "¿Puedes bailar?": "Atrápame en el club",
-                "¿Cuál es tu sueño?": "Poseer una pequeña/mediana empresa de software con un equipo increíble. Ah, y una familia.",
-                "¿Qué puede detener tu sueño?": "Salud, malas emociones, computadora rota.",
-                "¿Cuál es tu religión?": "Hinduismo",
-                "¿Mañanas o noches?": "Noches",
-                "¿Perros o gatos?": "Perros",
-                "¿Algo en lo que desearías ser bueno?": "Andar en patineta",
-                "¿Cómo es que estás soltero?": "Tengo una serpiente",
-                "¿Crush famoso de la infancia?": "Hannah Montana",
-                "¿Lenguaje de programación favorito?": "Java",
-                "¿Primer teléfono?": "Sony Ericsson C905",
-                "¿App favorita?": "SoundCloud",
-                "¿Fruta favorita?": "Pineapppplesss...",
-                "¿Red social favorita?": "Reddit de lejos",
-                "¿Canción favorita?": "Money Trees de Kendrick Lamar",
-                "¿Qué fue lo más reciente que leíste?": "Los ensayos de Paul Graham",
-                "¿Qué te llevó a la programación?": "Decidir impulsivamente tomar ciencias de la computación como mi carrera universitaria y luego realmente disfrutar las oportunidades que presentó.",
-                "¿Tienes mascotas?": "Un lindo shih tzu y una serpiente de maíz que es una artista de la fuga.",
-                "¿Recuerdo más querido?": "Momentos en India.",
-                "¿Cuáles son tus metas actuales?": "Mejorar mis habilidades de desarrollo web, fortalecerme físicamente y mantenerme organizado.",
-                "¿Cuál es tu mayor miedo?": "Preguntarme a dónde se fue el tiempo. Adicciones. Muerte... profundo",
-                "¿Dónde quieres estar en 10 años?": "Con una familia propia.",
-                "¿Dónde vives?": "Dallas, Texas.",
-                "¿Segunda canción favorita?": "Superstar de Lupe Fiasco",
-                "¿Qué tan aburrido estás?": "Escribir esto es divertido.",
-                "¿Cosas que te molestan?": "La mentalidad cerrada, la ignorancia y los malditos conductores traseros.",
-                "¿Ídolos de la infancia?": "Kyrie Irving. Por cómo se comporta.",
-                "¿Maestro favorito?": "El sustituto maestra a largo plazo en segundo grado.",
+                "¿comida favorita?": "panqueques",
+                "¿pasatiempos?": "baloncesto, programación, navegar, películas, cocinar",
+                "¿película favorita?": "matrix",
+                "¿segundo nombre?": "Surya Alexander Polina suena bien",
+                "¿qué hora es?": getCurrentCentralTime() + " (Hora Central)",
+                "¿casado?": "los mensajes directos están abiertos",
+                "¿color favorito?": "verde",
+                "¿videojuegos?": "nba 2K12, pokémon, principalmente juegos móviles ahora",
+                "¿sueño?": "emprendedor",
+                "¿religión?": "hinduismo",
+                "¿mañanas o noches?": "noches",
+                "¿perros o gatos?": "perros",
+                "¿celebridad de la infancia?": "Naomi Scott",
+                "¿lenguaje de programación?": "java, javascript",
+                "¿primer teléfono?": "SE C905",
+                "¿aplicación favorita?": "soundcloud",
+                "¿fruta favorita?": "piña",
+                "¿canción favorita?": "money trees, cherish the day, superstar",
+                "¿dónde vives?": "Dallas",
+                "¿ídolos?": "Kyrie Irving, Lamar Jackson, LeBron James, Spider-Man",
+                "¿supermercado?": "sprouts"
             }
         };
 
@@ -220,7 +162,7 @@
             // Set the default "Select question" option based on the current language
             const defaultOption = document.createElement('option');
             defaultOption.value = "";
-            defaultOption.textContent = currentLanguage === 'en' ? 'Select question' : 'seleccionar pregunta';
+            defaultOption.textContent = currentLanguage === 'en' ? 'select question' : 'seleccionar pregunta';
             questionSelect.appendChild(defaultOption);
 
             // Populate the dropdown with questions
@@ -232,35 +174,19 @@
             }
         }
 
-        // Get the translated question if it exists in the new language
-        function getTranslatedQuestion(question) {
-            const otherLanguage = currentLanguage === 'en' ? 'es' : 'en';
-            for (const q in qa[otherLanguage]) {
-                if (qa[otherLanguage][q] === qa[currentLanguage][question]) {
-                    return q;
-                }
-            }
-            return null;
-        }
-
         // Handle dropdown selection
         document.getElementById('question-select').addEventListener('change', function() {
             selectedQuestion = this.value;
-            const answer = qa[currentLanguage][selectedQuestion] || "Sorry, I don't have an answer to that question.";
-            document.getElementById('answer').innerText = answer;
+            document.getElementById('answer').innerText = qa[currentLanguage][selectedQuestion] || '';
         });
 
         // Initial population of questions
         populateQuestions();
 
-
         function getCurrentCentralTime() {
             const centralTimeZone = 'America/Chicago';
             const centralTime = new Intl.DateTimeFormat('en-US', {
                 timeZone: centralTimeZone,
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
@@ -270,7 +196,6 @@
             return centralTime;
         }
     </script>
-    
 </body>
 
 </html>
