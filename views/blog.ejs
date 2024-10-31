@@ -21,27 +21,25 @@
         </nav>
     </header>
     <!-- Masonry Grid -->
-    <div class="masonry-grid masonry-grid-hidden mx-auto "> <!-- Ensure grid is centered and with margin -->
+    <div class="masonry-grid masonry-grid-hidden mx-auto px-4 "> <!-- Ensure grid is centered and with margin -->
         <% posts.forEach(function(post, index) { %>
-        <div class="masonry-grid-item ">
+        <div class="masonry-grid-item">
             <a href="/blog/<%= post.id %>" class="no-underline text-black">
-                <div class="bg-white hover:bg-blue-100 overflow-hidden p-1 rounded-3xl ">
-                    <h1 class="text-xl text-gray-900 mb-4 mt-3 px-4 font-semibold "><%= post.title %></h2>
+                <div class="bg-white hover:bg-blue-100 overflow-hidden p-3 mb-1">
+                    <h2 class="text-lg font-bold"><%= post.title %></h2>
                     <% if (post.imagePath) { %>
-                    <div class="px-5 mb-4">
-                        <img src="<%= post.imagePath %>" alt="Thumbnail" class="rounded-xl">
-                    </div>
+                    <img src="<%= post.imagePath %>" alt="Thumbnail" class="w-full p-3">
                     <% } %>
-                    <p class="mb-1 text-sm px-4 text-gray-700"><%= post.preview %></p>
-                    <div class="px-2">
+                    <p class="mb-1 text-sm"><%= post.preview %></p>
+                    <div>
                         <% post.tags.forEach(function(tag) { %>
                         <a href="/blog/tag/<%= tag %>"
-                            class="p-2 text-xs font-semibold text-blue-700 hover:bg-gray-300 inline-block rounded-lg">
+                            class="bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-300 inline-block">
                             <%= tag %>
                         </a>
                         <% }) %>
                     </div>
-                    <p class="text-xs text-center text-gray-400 px-4 mb-2">
+                    <p class="text-xs text-gray-500 mt-2">
                         <%= post.views %> views
                     </p>
                 </div>
@@ -51,24 +49,23 @@
     </div>
 
     <script>
-
         document.addEventListener('DOMContentLoaded', () => {
             initializeMasonry();
         });
 
         function initializeMasonry() {
-            if (isThumbnailsLoaded()) {
-                generateMasonry();
+            if (areThumbnailsLoaded()) {
+                setupMasonryGrid();
             } else {
                 setTimeout(initializeMasonry, 100);
             }
         }
 
-        function isThumbnailsLoaded() {
+        function areThumbnailsLoaded() {
             return Array.from(document.images).every(image => image.complete);
         }
 
-        function generateMasonry() {
+        function setupMasonryGrid() {
             const grid = document.querySelector('.masonry-grid');
             grid.classList.remove('masonry-grid-hidden');
 
@@ -78,6 +75,19 @@
                 fitWidth: true,
                 gutter: 8
             });
+        }
+
+        function handleTagClick(event, tag) {
+            event.stopPropagation();
+            event.preventDefault();
+            window.location.href = `/blog/tag/${tag}`;
+        }
+
+        function handleTouchEvent(event) {
+            if (event.type === 'touchend') {
+                const link = event.currentTarget;
+                window.location.href = link.href;
+            }
         }
 
     </script>

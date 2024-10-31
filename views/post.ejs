@@ -24,7 +24,7 @@
   <div class="container mx-auto px-4 py-6">
     <div class="grid md:grid-cols-3 gap-4">
       <!-- Post Article -->
-      <article class="md:col-span-2 bg-white overflow-hidden p-4 rounded-3xl">
+      <article class="md:col-span-2 bg-white overflow-hidden p-4">
         <h1 class="text-2xl font-bold my-4 text-center"><%= post.title %></h1>
         <p class="text-gray-500 mb-1 text-center">
           <%= new Date(post.date_created).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) %>
@@ -34,32 +34,32 @@
         </div>
       </article>
       <!-- Comment Form, initially hidden, revealed upon clicking the 'Post comment' input -->
-      <div class="">
-        <div id="comment-trigger" class="mb-4 bg-white p-1 rounded-2xl">
+      <div class="w-full">
+        <div id="comment-trigger" class="mb-4 bg-white p-1">
           <input 
             type="text" 
             class="p-2 w-full" 
-            placeholder="comments" 
+            placeholder="Post comment" 
             onclick="toggleCommentForm()"
           />
         </div>
         <!-- Comment Form, adjust width as necessary -->
         <div id="comment-form" class="hidden w-full">
-            <div class="bg-white p-6 rounded-2xl">
+            <div class="bg-white p-2">
                 <form action="./comment" method="POST">
-                    <textarea name="comment" rows="4" class="border border-gray-100 w-full p-2 mb-3 rounded-lg" placeholder="input text" required></textarea>
+                    <textarea name="comment" rows="4" class="border border-gray-200 w-full p-2 mb-4" placeholder="Enter Comment" required></textarea>
                     <div class="mb-4">
-                        <input type="text" name="name" class="border border-gray-100 w-full p-2 rounded-lg" placeholder="name" required>
+                        <input type="text" name="name" class="border border-gray-200 w-full p-2" placeholder="Real Name" required>
                     </div>
                     <div class="mb-4">
-                        <input type="email" name="email" class="border border-gray-100 w-full p-2 rounded-lg" placeholder="email" required>
+                        <input type="email" name="email" class="border border-gray-200 w-full p-2" placeholder="Email" required>
                     </div>
-                    <div class="">
-                        <input type="password" name="password" class="border border-gray-100 w-full p-2 rounded-lg" placeholder="password for editing (not needed)">
+                    <div class="mb-4">
+                        <input type="password" name="password" class="border border-gray-200 w-full p-2" placeholder="Password for edit (Optional)">
                     </div>
-                    <div class="flex mt-5">
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 focus:outline-none focus:shadow-outline mr-2 rounded-lg"> submit</button>
-                        <button type="button" class="bg-red-500 hover:bg-red-700 text-white py-1 px-3 focus:outline-none focus:shadow-outline rounded-lg" onClick="hideCommentForm()">cancel</button>
+                    <div class="flex items-center">
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 focus:outline-none focus:shadow-outline mr-1"> Submit</button>
+                        <button type="button" class="bg-gray-300 hover:bg-gray-400 text-black py-1 px-2 focus:outline-none focus:shadow-outline" onClick="hideCommentForm()">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -67,7 +67,7 @@
         <!-- Comments Section -->
         <div class="md:col-span-3 mt-4">
           <% comments.forEach(function(comment) { %>
-            <div class="comment bg-gray-100 p-3 mb-4 rounded-2xl" id="comment-<%= comment.id %>">
+            <div class="comment bg-gray-100 p-3 mb-4" id="comment-<%= comment.id %>">
               <div class="flex justify-between items-center">
                 <div>
                   <div class="font-bold text-lg"><%= comment.name %></div>
@@ -75,9 +75,9 @@
                   <p class="comment-text"><%= comment.comment %></p>
                   <textarea class="comment-edit-textarea border border-gray-300 w-full p-2 mb-1 hidden" rows="4" required><%= comment.comment %></textarea>
                   <input type="password" class="comment-edit-passcode border border-gray-300 w-full p-2 mb-3 hidden" placeholder="Password" required>
-                  <button onClick="updateComment('<%= comment.id %>')" class="save-edit hidden bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded-lg">Update</button>
-                  <button onClick="deleteComment('<%= comment.id %>')" class="delete-edit hidden bg-red-500 hover:bg-blue-700 text-white py-1 px-2 rounded-lg">Delete</button>
-                  <button onClick="cancelEdit('<%= comment.id %>')" class="cancel-edit hidden bg-gray-300 hover:bg-gray-400 text-black py-1 px-2 rounded-lg">Cancel</button>
+                  <button onClick="updateComment('<%= comment.id %>')" class="save-edit hidden bg-blue-500 hover:bg-blue-700 text-white py-1 px-2">Update</button>
+                  <button onClick="deleteComment('<%= comment.id %>')" class="delete-edit hidden bg-red-500 hover:bg-blue-700 text-white py-1 px-2">Delete</button>
+                  <button onClick="cancelEdit('<%= comment.id %>')" class="cancel-edit hidden bg-gray-300 hover:bg-gray-400 text-black py-1 px-2">Cancel</button>
                 </div>
                   <a href="javascript:void(0)" onclick="editComment('<%= comment.id %>')" class="edit-link text-blue-600 hover:text-blue-800 cursor-pointer px-4">
                     edit
