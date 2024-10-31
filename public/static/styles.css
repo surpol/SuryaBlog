@@ -4,7 +4,7 @@ body{
 }
 
 .masonry-grid-item {
-  width: 300px; /* Default width for larger screens */
+  width: 315px; /* Default width for larger screens */
   margin-bottom: 10px;
 }
 

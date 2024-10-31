@@ -184,23 +184,33 @@ app.get('/blog/:id', async (req, res) => {
 });
 
 
-// Retrieve blog with tag
+// Retrieve blog posts by tag, including associated tags
 app.get('/blog/tag/:tagId', async (req, res) => {
   try {
     const db = await dbPromise;
     const tagName = decodeURIComponent(req.params.tagId);
     
-    // Query to select posts with the given tag name, ordered by date descending
-    const posts = await db.all(`
-      SELECT Posts.* FROM Posts
+    // Query to select posts with the given tag name, along with associated tags
+    const postsWithTags = await db.all(`
+      SELECT Posts.*, GROUP_CONCAT(Tags.name) as tags
+      FROM Posts
       JOIN PostTags ON Posts.id = PostTags.post_id
-      JOIN Tags ON PostTags.tag_id = Tags.id
-      WHERE Tags.name = ?
+      JOIN Tags AS MainTag ON MainTag.id = PostTags.tag_id
+      LEFT JOIN PostTags AS AllPostTags ON Posts.id = AllPostTags.post_id
+      LEFT JOIN Tags ON AllPostTags.tag_id = Tags.id
+      WHERE MainTag.name = ?
+      GROUP BY Posts.id
       ORDER BY Posts.date_created DESC
     `, tagName);
 
-    // Render the page with the filtered posts
-    res.render('tags', { posts, tagName }); // You'll need a 'tag.ejs' view for this
+    // Process the posts to include a tags array
+    const posts = postsWithTags.map(post => ({
+      ...post,
+      tags: post.tags ? post.tags.split(',') : []
+    }));
+
+    // Render the page with the filtered posts and tagName
+    res.render('tags', { posts, tagName });
   } catch (error) {
     console.error('Database query error:', error.message);
     res.status(500).send('Error fetching posts by tag');
