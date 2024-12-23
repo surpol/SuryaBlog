@@ -10,33 +10,45 @@
     <link rel="stylesheet" type="text/css" href="/static/styles.css" />
 </head>
 
-<body>
-    <div>
-        <header class="text-center py-6">
-            <h1 class="text-3xl font-bold mt-5 hover:text-purple-800"><a href="/blog">Surya Polina</a></h1>
-            <nav class="mt-4">
-                <a href="/about" class="text-blue-600 hover:text-purple-800 mx-2">About</a>
-                <a href="/blog" class="text-blue-600 hover:text-purple-800 mx-2">Blog</a>
-                <a href="/portfolio" class="text-blue-600 hover:text-purple-800 mx-2">Portfolio</a>
-            </nav>
-        </header>
-        <div class="container mx-auto px-4 py-8">
-            <div class="grid grid-cols-1 gap-4">
-                <!-- Portfolio items -->
-                <a href="https://rental-booking-system.vercel.app" class="no-underline text-black flex items-center bg-white hover:bg-purple-100 overflow-hidden w-full max-w-md mx-auto rounded-3xl">
-                    <img src="images/southernrentalcars.jpg" alt="Project 2" class="w-36 h-36 object-cover flex-shrink-0">
-                    <div class="ml-4">
-                        <h2 class="font-semibold text-lg">Southern Rental Cars</h2>
-                        <p class="text-blue-600 hover:text-blue-800 text-sm">southernrentalcars.com</p>
-                    </div>
-                </a>
-                <a href="https://suryapolina.com/story-board/" class="no-underline text-black flex items-center bg-white hover:bg-purple-100 overflow-hidden w-full max-w-md mx-auto rounded-3xl">
-                    <img src="images/freekanban.jpg" alt="Project 3" class="w-36 h-36 object-cover flex-shrink-0">
-                    <div class="ml-4">
-                        <h2 class="font-semibold text-lg">Free Kanban</h2>
-                    </div>
-                </a>
-            </div>
+<body class="bg-white">
+    <header class="text-center py-6">
+        <nav class="mt-4">
+            <a href="/about" class="text-blue-600 hover:text-purple-800 mx-2">About</a>
+            <a href="/blog" class="text-blue-600 hover:text-purple-800 mx-2">Blog</a>
+            <a href="/portfolio" class="text-blue-600 hover:text-purple-800 mx-2">My Pages</a>
+        </nav>
+    </header>
+
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 gap-6">
+            <!-- Portfolio items -->
+            <a href="https://rental-booking-system.vercel.app" 
+               class="no-underline text-black flex items-center border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden w-full max-w-md mx-auto rounded-2xl">
+                <img src="images/southernrentalcars.jpg" alt="Project 2" class="w-36 h-36 object-cover flex-shrink-0">
+                <div class="ml-4">
+                    <h2 class="font-semibold text-lg text-gray-900">Southern Rental Cars</h2>
+                    <p class="text-blue-600 hover:text-blue-800 text-sm">southernrentalcars.com</p>
+                </div>
+            </a>
+
+            <a href="https://suryapolina.com/story-board/" 
+               class="no-underline text-black flex items-center border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden w-full max-w-md mx-auto rounded-2xl">
+                <img src="images/freekanban.jpg" alt="Project 3" class="w-36 h-36 object-cover flex-shrink-0">
+                <div class="ml-4">
+                    <h2 class="font-semibold text-lg text-gray-900">Free Kanban</h2>
+                </div>
+            </a>
+
+            <a href="https://suryapolina.com/school-shooting-awareness-site/" 
+               class="no-underline text-black flex items-center border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden w-full max-w-md mx-auto rounded-2xl">
+                <div class="w-36 h-36 bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-chart-bar text-4xl text-gray-400"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="font-semibold text-lg text-gray-900">School Shooting Data</h2>
+                    <p class="text-sm text-gray-600">Interactive data visualization</p>
+                </div>
+            </a>
         </div>
     </div>
 </body>

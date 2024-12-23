@@ -4,44 +4,44 @@
 <head>
     <title>suryapolina.com</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
     <link rel="stylesheet" type="text/css" href="/static/styles.css" />
     <link rel="icon" type="image/png" href="/images/favicon.ico">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
 </head>
-<body>
-     <!-- Header --->
-     <header class="text-center py-6">
-        <h1 class="text-3xl font-bold mt-5 hover:text-purple-800"><a href="/blog">Surya Polina</a></h1>
+<body class="bg-white">
+    <header class="text-center py-6">
         <nav class="mt-4">
             <a href="/about" class="text-blue-600 hover:text-purple-800 mx-2">About</a>
             <a href="/blog" class="text-blue-600 hover:text-purple-800 mx-2">Blog</a>
-            <a href="/portfolio" class="text-blue-600 hover:text-purple-800 mx-2">Portfolio</a>
-          </nav>
-      </header>
+            <a href="/portfolio" class="text-blue-600 hover:text-purple-800 mx-2">My Pages</a>
+        </nav>
+    </header>
     <!-- Masonry Grid -->
     <div class="masonry-grid masonry-grid-hidden mx-auto "> <!-- Ensure grid is centered and with margin -->
         <% posts.forEach(function(post, index) { %>
         <div class="masonry-grid-item ">
             <a href="/blog/<%= post.id %>" class="no-underline text-black">
-                <div class="bg-white hover:bg-purple-100 overflow-hidden p-1 rounded-3xl ">
-                    <h1 class="text-xl text-gray-900 mb-4 mt-3 px-4 font-semibold "><%= post.title %></h2>
+                <div class="border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden p-3 rounded-2xl">
+                    <h1 class="text-xl text-gray-900 mb-3 mt-2 px-2 font-semibold "><%= post.title %></h2>
                     <% if (post.imagePath) { %>
-                    <div class="px-5 mb-4">
-                        <img src="<%= post.imagePath %>" alt="Thumbnail" class="rounded-xl">
+                    <div class="px-2 mb-3">
+                        <img src="<%= post.imagePath %>" alt="Thumbnail" class="rounded-xl w-full">
                     </div>
                     <% } %>
-                    <p class="mb-1 text-sm px-4 text-gray-700"><%= post.preview %></p>
-                    <div class="px-2">
+                    <p class="mb-3 text-sm px-2 text-gray-600"><%= post.preview %></p>
+                    <div class="px-2 mb-2">
                         <% post.tags.forEach(function(tag) { %>
                         <a href="/blog/tag/<%= tag %>"
-                            class="p-2 text-xs font-semibold text-blue-700 hover:bg-gray-300 inline-block rounded-lg">
+                            class="mr-2 mb-2 px-3 py-1 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 inline-block rounded-full">
                             <%= tag %>
                         </a>
                         <% }) %>
                     </div>
-                    <p class="text-xs text-center text-gray-400 px-4 mb-2">
+                    <p class="text-xs text-center text-gray-400 px-2 mb-1">
                         <%= post.views %> views
                     </p>
                 </div>

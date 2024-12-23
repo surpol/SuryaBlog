@@ -6,49 +6,44 @@
     <title>suryapolina.com</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Explore Surya Polina's website about technology and other stuff">
+    <meta name="description" content="Explore Surya Polina's website about stuff">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
     <link rel="stylesheet" type="text/css" href="/static/styles.css" />
     <link rel="icon" type="image/png" href="/images/favicon.ico">
 </head>
 
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-white text-gray-900">
     <!-- Header -->
     <header class="text-center py-6">
-        <h1 class="text-3xl font-bold mt-5 hover:text-purple-800"><a href="/blog">Surya Polina</a></h1>
         <nav class="mt-4">
             <a href="/about" class="text-blue-600 hover:text-purple-800 mx-2">About</a>
             <a href="/blog" class="text-blue-600 hover:text-purple-800 mx-2">Blog</a>
-            <a href="/portfolio" class="text-blue-600 hover:text-purple-800 mx-2">Portfolio</a>
+            <a href="/portfolio" class="text-blue-600 hover:text-purple-800 mx-2">My Pages</a>
         </nav>
     </header>
 
     <!-- Main Content -->
-    <div class="container mx-auto px-4 py-8">
-        <div class="grid gap-8 max-w-3xl mx-auto">
-            <img class="profile-picture mx-auto rounded-full w-48 h-48 border-4 border-purple-500 shadow-lg" src="/images/self.jpg" alt="Profile Picture"> 
+    <div class="container mx-auto px-4 py-2">
+        <div class="grid max-w-2xl mx-auto">
             <!-- About Me Section -->
-            <div id="about-me-card" class="p-6 bg-white rounded-lg shadow-lg transition-all hover:shadow-xl transform hover:-translate-y-1">
+            <div id="about-me-card" class="border border-gray-200 p-6 rounded-2xl bg-white">
                 <!-- English Paragraph -->
-                <p id="about-text-en" class="text-left text-gray-800 leading-relaxed mb-4"> 
-                    I am a web developer. I like to play sports. I like to watch the Ravens and Cavs. I like pancakes and syrup. I'm South Asian. I like my computer.
-                    Posts are generated from my head and fingers.
-                    Content ranges from a variety of interesting topics.
-                    I will narrow the content focus overtime. 
+                <p id="about-text-en" class="text-left text-gray-600 leading-relaxed mb-6"> 
+                    I'm a web developer. I'm also a Cleveland Cavs and Ravens fan, don't ask why.
+                    Learn more about me on this page. 
                 </p>
                 <!-- Spanish Paragraph -->
-                <p id="about-text-es" class="text-left text-gray-800 leading-relaxed mb-4 hidden"> 
-                    Soy desarrollador web. Me gustan los deportes. Me gustan los Ravens y los Cavs. Me gustan los panqueques y jarabe. Soy del sur de asia. Me gusta mi computadora.
-                    Mis publicaciones se generan con mis dedos.
-                    Mi contenido abarcará una variedad de temas.
-                    Espero enfocarlo en un tema más específico.
+                <p id="about-text-es" class="text-left text-gray-600 leading-relaxed mb-6 hidden"> 
+                    Soy ingeniero de software y/o desarrollador web. También soy fan de los Cleveland Cavaliers y los Baltimore Ravens.
+                    Conoce más sobre mí en esta página.
                 </p>
                 
                 <!-- Toggle for more information -->
                 <div id="qa" class="flex flex-col items-center mt-6">
                     <div class="w-full max-w-xs mb-4">
-                        <select id="question-select" class="border border-gray-300 p-2 w-full rounded-lg text-gray-700 focus:outline-none focus:border-purple-500">
+                        <select id="question-select" 
+                                class="w-full p-2 rounded-xl border border-gray-200 text-gray-700 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400">
                             <option>Q/A</option>
                         </select>
                     </div>
@@ -56,23 +51,24 @@
                 </div>
             </div>
         </div>      
-            
-            <!-- Language Toggle Button -->
-            <div class="text-center mt-8"> <!-- Centering the button -->
-                <button id="translate-toggle" class="px-4 py-2 bg-purple-500 text-white font-medium rounded-lg shadow-lg hover:bg-purple-600 transition-all">
-                    en español
-                </button>
-            </div>      
+        
+        <!-- Language Toggle Button -->
+        <div class="text-center mt-8">
+            <button id="translate-toggle" 
+                    class="px-4 py-2 border border-gray-200 text-gray-700 font-medium rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
+                español
+            </button>
+        </div>      
 
-            <!-- Contact Section -->
-            <div class="text-center mt-8">
-                <a href="mailto:thesuryapolina@gmail.com" class="text-gray-600 hover:text-purple-600 transition-all mr-4">
-                    <i class="fas fa-envelope fa-lg"></i>
-                </a>
-                <a href="https://twitter.com/suryapolina" target="_blank" class="text-gray-600 hover:text-purple-600 transition-all">
-                    <i class="fab fa-twitter fa-lg"></i>
-                </a>
-            </div>
+        <!-- Contact Section -->
+        <div class="text-center mt-8">
+            <a href="mailto:thesuryapolina@gmail.com" class="text-gray-500 hover:text-gray-700 transition-all mr-4">
+                <i class="fas fa-envelope fa-lg"></i>
+            </a>
+            <a href="https://twitter.com/suryapolina" target="_blank" class="text-gray-500 hover:text-gray-700 transition-all">
+                <i class="fab fa-twitter fa-lg"></i>
+            </a>
+        </div>
     </div>
 
     <script>
@@ -92,7 +88,7 @@
             currentLanguage = currentLanguage === 'en' ? 'es' : 'en';
             
             // Update button text to reflect the other language
-            this.innerText = currentLanguage === 'en' ? 'en español' : 'in english';
+            this.innerText = currentLanguage === 'en' ? 'español' : 'english';
 
             // Populate questions in the dropdown
             populateQuestions();
@@ -105,50 +101,48 @@
 
         const qa = {
             en: {
-                "favorite food?": "pancakes",
-                "hobbies?": "basketball, coding, browsing, movies, cooking",
-                "favorite movie?": "matrix",
+                "favorite food?": "pancakes + syrup",
+                "hobbies?": "basketball, movies, cooking",
+                "favorite movie?": "Matrix",
                 "middle name?": "Surya Alexander Polina sounds nice",
                 "current time?": getCurrentCentralTime() + " (Central Time)",
-                "married?": "dms are still open",
+                "married?": "dm open",
                 "favorite color?": "green",
-                "video games?": "nba 2K12, pokemon, mostly mobile games now",
+                "video games?": "NBA 2K12, Pokemon",
                 "dreams?": "entrepreneur",
-                "religion?": "hindu",
+                "religion?": "Hindu",
                 "morning or night?": "night",
                 "dogs or cats?": "dogs",
-                "celebrity crush?": "Naomi Scott",
                 "programming language?": "java, javascript",
                 "first phone?": "SE C905",
-                "favorite app?": "soundcloud",
+                "favorite app?": "Soundcloud",
                 "favorite fruit?": "pineapple",
-                "favorite song?": "money trees. cherish the day, superstar",
-                "where do you live?": "dallas",
+                "favorite song?": "Money trees. Cherish the day, Superstar",
+                "where do you live?": "Dallas",
                 "idols?": "Kyrie Irving, Lamar Jackson, Lebron James, Spider-man",
-                "grocery store?": "sprouts",
+                "grocery store?": "Sprouts",
             },
             es: {
                 "¿comida favorita?": "panqueques",
-                "¿pasatiempos?": "baloncesto, programación, navegar, películas, cocinar",
-                "¿película favorita?": "matrix",
+                "¿pasatiempos?": "baloncesto, navegar, películas, cocinar",
+                "¿película favorita?": "Matrix",
                 "¿segundo nombre?": "Surya Alexander Polina suena bien",
                 "¿qué hora es?": getCurrentCentralTime() + " (Hora Central)",
                 "¿casado?": "los mensajes directos están abiertos",
                 "¿color favorito?": "verde",
-                "¿videojuegos?": "nba 2K12, pokémon, principalmente juegos móviles ahora",
+                "¿videojuegos?": "NBA 2K12, Pokémon",
                 "¿sueño?": "emprendedor",
-                "¿religión?": "hinduismo",
+                "¿religión?": "Hinduismo",
                 "¿mañanas o noches?": "noches",
                 "¿perros o gatos?": "perros",
-                "¿celebridad de la infancia?": "Naomi Scott",
                 "¿lenguaje de programación?": "java, javascript",
                 "¿primer teléfono?": "SE C905",
-                "¿aplicación favorita?": "soundcloud",
+                "¿aplicación favorita?": "Soundcloud",
                 "¿fruta favorita?": "piña",
-                "¿canción favorita?": "money trees, cherish the day, superstar",
+                "¿canción favorita?": "Money trees, Cherish the day, Superstar",
                 "¿dónde vives?": "Dallas",
                 "¿ídolos?": "Kyrie Irving, Lamar Jackson, LeBron James, Spider-Man",
-                "¿supermercado?": "sprouts"
+                "¿supermercado?": "Sprouts"
             }
         };
 
@@ -160,7 +154,7 @@
             // Set the default "Select question" option based on the current language
             const defaultOption = document.createElement('option');
             defaultOption.value = "";
-            defaultOption.textContent = currentLanguage === 'en' ? 'select question' : 'seleccionar pregunta';
+            defaultOption.textContent = currentLanguage === 'en' ? 'question' : 'pregunta';
             questionSelect.appendChild(defaultOption);
 
             // Populate the dropdown with questions
@@ -195,5 +189,4 @@
         }
     </script>
 </body>
-
 </html>

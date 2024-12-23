@@ -1,10 +1,46 @@
-body{
-  font-family: Helvetica-neue, Helvetica, sans-serif;
-  background-color: #f1f1f1;
+/* Base font settings */
+:root {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+body, 
+input, 
+button, 
+textarea, 
+select {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.025em;
+}
+
+/* Specific styles */
+.site-title {
+  letter-spacing: -0.025em;
+  font-weight: 600;
+}
+
+
+.prose {
+  letter-spacing: -0.01em;
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.tag {
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Existing styles */
 .masonry-grid-item {
-  width: 315px; /* Default width for larger screens */
+  width: 315px;
   margin-bottom: 10px;
 }
 
@@ -13,11 +49,11 @@ body{
 }
 
 .profile-picture {
-  width: 200px; /* Set the desired width */
-  height: 200px; /* Set the desired height */
-  border-radius: 50%; /* Makes the image circular */
-  object-fit: cover; /* Ensures the image covers the entire area without stretching */
-  border: 2px solid #fff; /* Optional: adds a white border around the image */
-  margin-bottom: 20px; /* Adds some spacing below the image */
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  margin-bottom: 20px;
 }
 
