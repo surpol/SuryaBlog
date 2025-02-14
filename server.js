@@ -15,7 +15,6 @@ const cheerio = require('cheerio');
 const NodeCache = require('node-cache');
 // Cache entries expire after 60 seconds (adjust as needed)
 const viewCache = new NodeCache({ stdTTL: 360 }); 
-const twilio = require('twilio');
 
 const app = express();
 
