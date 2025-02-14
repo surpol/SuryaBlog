@@ -17,11 +17,12 @@
         <nav class="mt-4">
             <a href="/about" class="text-blue-600 hover:text-purple-800 mx-2">About</a>
             <a href="/blog" class="text-blue-600 hover:text-purple-800 mx-2">Blog</a>
-            <a href="/portfolio" class="text-blue-600 hover:text-purple-800 mx-2">My Pages</a>
+            <a href="/portfolio" class="text-blue-600 hover:text-purple-800 mx-2">Portfolio</a>
         </nav>
     </header>
+
     <!-- Masonry Grid -->
-    <div class="masonry-grid masonry-grid-hidden mx-auto "> <!-- Ensure grid is centered and with margin -->
+    <div class="masonry-grid masonry-grid-hidden mx-auto">
         <% posts.forEach(function(post, index) { %>
         <div class="masonry-grid-item ">
             <a href="/blog/<%= post.id %>" class="no-underline text-black">

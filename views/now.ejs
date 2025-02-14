@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>suryapolina.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles.css" />
+    <link rel="icon" type="image/png" href="/images/favicon.ico">
+</head>
+
+<body class="bg-white text-gray-900">
+    <header class="text-center py-6">
+        <nav class="mt-4">
+            <a href="/about" class="text-blue-600 hover:text-purple-800 mx-2">About</a>
+            <a href="/blog" class="text-blue-600 hover:text-purple-800 mx-2">Blog</a>
+            <a href="/portfolio" class="text-blue-600 hover:text-purple-800 mx-2">Portfolio</a>
+        </nav>
+    </header>
+
+    <div class="container mx-auto px-4 py-2">
+        <div class="grid max-w-2xl mx-auto">
+            <div class="border border-gray-200 p-6 rounded-2xl bg-white">                
+                <div class="space-y-6 text-gray-600">
+                    <section>
+                        <h2 class="text-lg font-medium text-gray-900 mb-2">Currently busy with</h2>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Exploring ideas for the internet</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2 class="text-lg font-medium text-gray-900 mb-2">Following</h2>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Cleveland Cavaliers</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 class="text-lg font-medium text-gray-900 mb-2">Location</h2>
+                        <p>Living in Dallas, TX</p>
+                    </section>
+
+                    <div class="text-sm text-gray-500 mt-8">
+                        Last updated: <%= new Date().toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        }) %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

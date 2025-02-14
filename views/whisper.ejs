@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-white p-4">
+    <div class="max-w-md mx-auto">
+        <!-- Code word form -->
+        <form id="code-form" class="space-y-4">
+            <input 
+                type="text"
+                name="code"
+                class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                placeholder="Code word"
+                autofocus
+            >
+        </form>
+
+        <!-- Hidden whisper form -->
+        <form id="whisper-form" class="space-y-4 hidden">
+            <textarea 
+                name="text"
+                class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                rows="3"
+                placeholder="What's on your mind?"
+            ></textarea>
+            <button type="submit" class="w-full px-4 py-2 text-white bg-blue-600 rounded-xl hover:bg-blue-700">
+                Whisper
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const codeForm = document.getElementById('code-form');
+        const whisperForm = document.getElementById('whisper-form');
+        const codeInput = codeForm.querySelector('input');
+        let validCode = ''; // Store the code
+
+        // Handle code submission
+        codeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            validCode = codeInput.value; // Store the entered code
+            whisperForm.classList.remove('hidden');
+            codeForm.classList.add('hidden');
+            whisperForm.querySelector('textarea').focus();
+        });
+
+        // Handle whisper submission
+        whisperForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = e.target.text.value;
+            
+            try {
+                const response = await fetch('/whisper', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        text,
+                        code: validCode
+                    })
+                });
+                
+                if (response.ok) {
+                    e.target.text.value = '';
+
+                } else {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to whisper');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);
+                if (error.message === 'Invalid code') {
+                    // Reset to code input if code was invalid
+                    whisperForm.classList.add('hidden');
+                    codeForm.classList.remove('hidden');
+                    codeInput.value = '';
+                    codeInput.focus();
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -15,6 +15,7 @@ const cheerio = require('cheerio');
 const NodeCache = require('node-cache');
 // Cache entries expire after 60 seconds (adjust as needed)
 const viewCache = new NodeCache({ stdTTL: 360 }); 
+const twilio = require('twilio');
 
 const app = express();
 
@@ -111,14 +112,14 @@ app.get('/portfolio', (req, res) => {
 app.get('/blog', async (req, res) => {
   try {
     const db = await dbPromise;
-		const postsWithTagsPromise = db.all(`
-		  SELECT Posts.*, GROUP_CONCAT(Tags.name) as tags
-		  FROM Posts
-		  LEFT JOIN PostTags ON Posts.id = PostTags.post_id
-		  LEFT JOIN Tags ON Tags.id = PostTags.tag_id
-		  GROUP BY Posts.id
-		  ORDER BY Posts.date_created DESC
-		`);
+    const postsWithTagsPromise = db.all(`
+      SELECT Posts.*, GROUP_CONCAT(Tags.name) as tags
+      FROM Posts
+      LEFT JOIN PostTags ON Posts.id = PostTags.post_id
+      LEFT JOIN Tags ON Tags.id = PostTags.tag_id
+      GROUP BY Posts.id
+      ORDER BY Posts.date_created DESC
+    `);
 
     const postsWithTags = await postsWithTagsPromise;
     
@@ -694,4 +695,51 @@ const setup = async () => {
 }
 
 setup();
+
+// Add this with your other routes
+app.get('/now', (req, res) => {
+    res.render('now');
+});
+
+// Keep this route for both web and API access
+app.get('/status', async (req, res) => {
+    try {
+      const db = await dbPromise;
+        const statuses = await db.all(`
+            SELECT * FROM Status 
+            ORDER BY created_at DESC
+        `);
+        res.render('status', { statuses });
+    } catch (error) {
+        console.error('Error fetching status updates:', error);
+        res.status(500).send('Error fetching status updates');
+    }
+});
+
+// Simplified status update endpoint
+app.post('/whisper', async (req, res) => {
+    try {
+        const { text, code } = req.body;
+        
+        // Verify the code word
+        if (code.toLowerCase() !== 'swoosh') {
+            return res.status(401).json({ error: 'Invalid code' });
+        }
+
+        if (!text) {
+            return res.status(400).json({ error: 'Status text is required' });
+        }
+
+        const db = await dbPromise;
+        await db.run('INSERT INTO Status (text, sender) VALUES (?, ?)', [text, 'whisper']);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error creating status:', error);
+        res.status(500).json({ error: 'Failed to create status' });
+    }
+});
+
+app.get('/whisper', (req, res) => {
+    res.render('whisper');
+});
 
