@@ -90,7 +90,7 @@ const verifyToken = (req, res, next) => {
 
 // Default route
 app.get('/', (req, res) => {
-  res.redirect('/blog');
+  res.redirect('/portfolio');
 });
 
 app.get('/about', (req, res) => {
