@@ -170,8 +170,8 @@ app.get('/blog/:id', async (req, res) => {
       $('h3').addClass('text-lg font-semibold');
 
       // Style code blocks
-      $('pre').addClass('my-4 p-4 bg-gray-50 rounded-xl overflow-x-auto whitespace-pre-wrap break-words max-w-full');
-      $('code').addClass('font-mono text-sm bg-gray-50 px-1 py-0.5 rounded');
+      $('pre').addClass('my-4 p-4 bg-gray-50 rounded-xl overflow-x-auto whitespace-pre-wrap break-words max-w-full text-xs sm:text-sm');
+      $('code').addClass('font-mono text-xs sm:text-sm bg-gray-50 px-1 py-0.5 rounded');
 
       // Update the post content with styled elements
       post.text = $.html();
