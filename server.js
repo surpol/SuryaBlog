@@ -75,7 +75,6 @@ const upload = multer({
 /* ----- Middleware -----*/
 const verifyToken = (req, res, next) => {
   const token = req.cookies['token']; // Get the token from the cookie
-  console.log("JWT Token: ", token);
   if (!token) {
       return res.status(403).send('A token is required for authentication');
   }
@@ -90,7 +89,7 @@ const verifyToken = (req, res, next) => {
 
 // Default route
 app.get('/', (req, res) => {
-  res.redirect('/portfolio');
+  res.redirect('/about');
 });
 
 app.get('/about', (req, res) => {
@@ -165,8 +164,14 @@ app.get('/blog/:id', async (req, res) => {
       // Load the post content into Cheerio for HTML manipulation
       const $ = cheerio.load(post.text);
 
-      // Apply Tailwind CSS classes to h1 tags
-      $('h1').addClass('text-2xl font-bold mt-4 mb-2');
+      // Apply styles to headings
+      $('h1').addClass('text-2xl font-bold');
+      $('h2').addClass('text-xl font-bold');
+      $('h3').addClass('text-lg font-semibold');
+
+      // Style code blocks
+      $('pre').addClass('my-4 p-4 bg-gray-50 rounded-xl overflow-x-auto whitespace-pre-wrap break-words max-w-full');
+      $('code').addClass('font-mono text-sm bg-gray-50 px-1 py-0.5 rounded');
 
       // Update the post content with styled elements
       post.text = $.html();
